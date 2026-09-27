@@ -27,7 +27,19 @@ import urllib.request
 import websockets
 
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
-PORT = 9333
+
+
+def free_port():
+    """다른 프로그램이 쓰지 않는 포트 (다른 세션의 크롬에 붙지 않도록 매번 새로 고른다)."""
+    import socket
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    p = s.getsockname()[1]
+    s.close()
+    return p
+
+
+PORT = free_port()
 KEYS = {
     "ArrowUp": ("ArrowUp", "ArrowUp", 38), "ArrowDown": ("ArrowDown", "ArrowDown", 40),
     "ArrowLeft": ("ArrowLeft", "ArrowLeft", 37), "ArrowRight": ("ArrowRight", "ArrowRight", 39),
@@ -80,14 +92,17 @@ async def run(plan, out_dir):
     for _ in range(50):
         try:
             tabs = json.load(urllib.request.urlopen("http://127.0.0.1:%d/json" % PORT))
-            pages = [t for t in tabs if t.get("type") == "page"]
+            # 방금 띄운 크롬은 about:blank 한 장만 열려 있다
+            pages = [t for t in tabs if t.get("type") == "page" and t.get("url") == "about:blank"]
             if pages:
                 ws_url = pages[0]["webSocketDebuggerUrl"]
                 break
         except Exception:
             pass
         time.sleep(0.2)
-    async with websockets.connect(ws_url, max_size=50_000_000) as ws:
+    if ws_url is None:
+        raise RuntimeError("띄운 크롬을 찾지 못했다 (port %d)" % PORT)
+    async with websockets.connect(ws_url, max_size=50_000_000, ping_interval=None) as ws:
         cdp = CDP(ws)
         await cdp.call("Page.enable")
         await cdp.call("Runtime.enable")
