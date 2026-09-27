@@ -7,6 +7,7 @@ signal toast(text: String)
 const SAVE_PATH := "user://save.cfg"
 const ALARM_MIN := 2 * 60 + 10      # 02:10 경보
 const POLICE_SECONDS := 20 * 60     # 02:30 경찰 도착
+const TIME_SCALE := 1.5             # 게임 속 20분이 실제로는 약 13분
 const FRIEND_LINE := 60             # 이 이상이면 '친밀'
 const BETRAY_LINE := 30             # 이 밑이면 그가 배신할 수 있다
 
@@ -25,6 +26,7 @@ var inventory: Array[String] = []
 var loot: Dictionary = {}       # 훔친 것 -> 값 (만원)
 var loot_split: Dictionary = {} # 곽두철과 반씩 나눈 것
 var flags: Dictionary = {}
+var notes: Array = []           # 수첩에 적은 단서 (적은 차례대로)
 var affinity := 40
 var met := false
 var coop := false
@@ -58,7 +60,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if clock_on and busy == 0 and phase == "play" and not get_tree().paused:
-		t += delta
+		t += delta * TIME_SCALE
 
 
 # ---------------------------------------------------------------- 한 판 ----
@@ -67,10 +69,11 @@ func new_run() -> void:
 	t = 0.0
 	clock_on = false
 	busy = 0
-	inventory = ["lockpick"]
+	inventory = ["lockpick", "notebook"]
 	loot = {}
 	loot_split = {}
 	flags = {}
+	notes = []
 	affinity = 40
 	met = false
 	coop = false

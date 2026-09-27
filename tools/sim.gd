@@ -15,7 +15,7 @@ func _ready() -> void:
 	scen = args[0] if args.size() > 0 else "all"
 	Game.test_mode = true
 	Engine.time_scale = 4.0
-	var list := ["endings", "agenda", "coop", "code", "print", "trap", "hostile", "betray"] if scen == "all" else [scen]
+	var list := ["endings", "agenda", "coop", "code", "print", "trap", "hostile", "betray", "hide"] if scen == "all" else [scen]
 	for s in list:
 		print("\n==== ", s, " ====")
 		await call("s_" + s)
@@ -78,6 +78,17 @@ func cell(f: String, x: int, y: int) -> Vector2i:
 func use(f: String, x: int, y: int, face: Vector2i, choices: Array = []) -> void:
 	await idle()
 	play.teleport_player(cell(f, x, y), face)
+	Game.test_choices = choices.duplicate()
+	play.interact()
+	await wait(0.1)
+	await idle()
+
+
+## 물건 앞에 서서 조사한다.
+func use_obj(id: String, choices: Array = []) -> void:
+	var spot := _stand_spot(W.obj(id))
+	await idle()
+	play.teleport_player(spot["cell"], spot["face"])
 	Game.test_choices = choices.duplicate()
 	play.interact()
 	await wait(0.1)
@@ -206,6 +217,15 @@ func s_code() -> void:
 	hide_player()
 	play.crook.active = false
 	play.player.set_hidden("")
+	# 단서를 보면 수첩에 적힌다
+	await use_obj("clock")
+	await use_obj("photo_wedding", [0])
+	await use_obj("nightstand", [1])
+	check(Game.notes == ["clock", "wedding", "watch"], "괘종시계, 결혼사진 뒷면, 회중시계가 차례로 수첩에 적힘 (%s)" % str(Game.notes))
+	Game.test_log = []
+	play.run(func(): await play.content.use_item("notebook", "펼친다"))
+	await idle()
+	check(Game.test_log.has("[수첩] 3줄"), "주머니에서 수첩을 펼침")
 	Game.test_codes = ["123456", "760515"]
 	await use("1F", 30, 18, Vector2i.DOWN, [0])
 	check(not Game.flag("front_open") and Game.wrong_codes == 1, "틀린 번호는 안 열림")
@@ -295,6 +315,33 @@ func s_hostile() -> void:
 			break
 	var id: String = await ending()
 	check(id == "killed", "엔딩: %s (기대 killed)" % id)
+
+
+## 숨었다가 실제 키 입력(Z)으로 나온다 (예전에 숨으면 못 나오던 버그)
+func s_hide() -> void:
+	await start_game()
+	play.crook.active = false
+	await use("2F", 7, 4, Vector2i.UP, [0])
+	check(play.player.hidden_in == "wardrobe", "옷장에 숨음")
+	await wait(0.5)
+	for pressed in [true, false]:
+		var ev := InputEventAction.new()
+		ev.action = "act"
+		ev.pressed = pressed
+		Input.parse_input_event(ev)
+		await wait(0.1)
+	await idle()
+	check(play.player.hidden_in == "" and play.player.visible, "Z 를 눌러 옷장에서 나옴")
+	# 숨어 있는 동안 곽두철이 그 자리에 와 섰으면 옆 칸으로 나온다
+	await use("2F", 7, 4, Vector2i.UP, [0])
+	var c: Actor = play.crook
+	c.active = true
+	c.place(play.player.cell, Vector2i.UP)
+	Game.test_choices = []
+	play.interact()
+	await wait(0.2)
+	await idle()
+	check(play.player.hidden_in == "" and play.player.cell != c.cell, "곽두철과 겹치지 않는 칸으로 나옴")
 
 
 ## 모든 물건을 차례로 조사한다 (선택지는 무작위). 실행 오류가 나면 Godot 이 SCRIPT ERROR 를 찍는다.

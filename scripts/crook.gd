@@ -25,7 +25,8 @@ const NOWHERE := Vector2i(-999, -999)
 const SEARCH_ROUTE := [["2F", 12, 6], ["2F", 25, 8], ["2F", 20, 15], ["1F", 26, 15], ["1F", 30, 4],
 		["1F", 18, 6], ["1F", 12, 16], ["1F", 40, 10], ["1F", 26, 17]]
 ## 혼자 나갈 계획의 단계
-const STEPS := ["search", "console", "massage", "knife", "crowbar", "cabinet", "bag", "chute", "roam"]
+const STEPS := ["search", "track", "console", "massage", "knife", "crowbar", "cabinet", "bag", "chute", "roam"]
+const TRACK_SECS := 70.0   # 수색이 끝나도 못 만났으면 발소리를 쫓아 도둑 쪽으로 가는 시간
 const CODE_TRIES := ["010101", "123456", "000000"]
 
 var play: Node
@@ -50,6 +51,7 @@ var _investigate := NOWHERE
 var _stuck := 0.0
 var _search_rooms: Array = []
 var _roam_wait := 0.0
+var _track_left := TRACK_SECS
 
 
 func _ready() -> void:
@@ -210,7 +212,8 @@ func hear(at: Vector2i, loud: float) -> void:
 
 # ---------------------------------------------------------------- 자기 계획 ----
 
-func _tick_agenda(delta: float) -> void:
+func _tick_agenda(real_delta: float) -> void:
+	var delta := real_delta * Game.TIME_SCALE   # 곽두철 계획도 시계 기준으로 흐른다
 	if can_see_player():
 		if not greeted or (step_name() == "roam" and play.content.wants_to_talk()):
 			mode = "approach"
@@ -220,6 +223,8 @@ func _tick_agenda(delta: float) -> void:
 			else:
 				bark("야, 도둑! 이리 와 봐.")
 			return
+	if step_name() == "track":
+		_track_left -= delta   # 기다리는 동안에도 줄어든다
 	if _investigate != NOWHERE:
 		if _go(_investigate, HURRY):
 			_investigate = NOWHERE
@@ -260,6 +265,14 @@ func _current_goal() -> Dictionary:
 					continue
 				var r: Array = _search_rooms[0]
 				return {"cell": world.world_cell(r[0], r[1], r[2]), "slow": true, "id": "search"}
+			"track":
+				# 이미 만났거나 70초가 지나면 자기 계획으로 돌아간다. 숨어 있으면 못 찾는다.
+				if greeted or _track_left <= 0.0:
+					goal_index += 1
+					continue
+				if _track_left >= TRACK_SECS:
+					bark("발소리가 났는데... 이쪽인가?", 2.5)
+				return {"cell": play.player.cell, "id": "track"}
 			"console":
 				if Game.flag("front_open") or Game.flag("crook_tried_code"):
 					goal_index += 1
@@ -314,7 +327,7 @@ func _roam_cell() -> Vector2i:
 				break
 			target_cell = cells.pick_random()
 		_roam_wait = 25.0
-	_roam_wait -= get_physics_process_delta_time()
+	_roam_wait -= get_physics_process_delta_time() * Game.TIME_SCALE
 	return target_cell
 
 
@@ -324,6 +337,10 @@ func _arrive_goal(g: Dictionary) -> void:
 			_search_rooms.pop_front()
 			_wait = 7.0
 			bark(["어디 숨었어?", "나와라, 좋은 말로 할 때.", "누가 들어온 거야...", "옷장 속인가?"].pick_random())
+		"track":
+			# 소리 난 자리까지 왔는데 아무도 없다 (숨어 있었다)
+			_wait = 2.0
+			bark("분명 이쪽에서 소리가 났는데...", 2.0)
 		"console":
 			_work = 40.0
 			_work_id = "console"

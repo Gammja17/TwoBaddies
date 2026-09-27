@@ -16,6 +16,7 @@ var ui: CanvasLayer
 var hud: Control
 var dlg: Control
 var pocket: Control
+var notebook: Control
 var picker: Control
 var keypad: Control
 var touch: Node
@@ -51,6 +52,8 @@ func setup(skip_prologue: bool) -> void:
 	ui.add_child(dlg)
 	pocket = preload("res://scripts/pocket.gd").new()
 	ui.add_child(pocket)
+	notebook = preload("res://scripts/notebook.gd").new()
+	ui.add_child(notebook)
 	picker = preload("res://scripts/lockpick.gd").new()
 	ui.add_child(picker)
 	picker.slipped.connect(func(): noise_at(player.cell, 6.0))
@@ -80,6 +83,10 @@ func run(script: Callable) -> void:
 	await script.call()
 	if is_instance_valid(dlg):
 		dlg.close()
+	if not _ended:
+		# 닫을 때 누른 Z가 곧바로 새 조사로 이어지지 않게 두 프레임 쉰다
+		await get_tree().physics_frame
+		await get_tree().physics_frame
 	Game.busy = max(0, Game.busy - 1)
 	player.control = true
 	_running = false

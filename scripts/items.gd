@@ -5,6 +5,8 @@ extends RefCounted
 const DB := {
 	"lockpick": {"name": "자물쇠 따개", "icon": "lockpick", "kind": "tool",
 		"desc": "만복의 밥줄. 서랍이나 보석함 정도의 작은 자물쇠는 이걸로 딴다."},
+	"notebook": {"name": "만복의 수첩", "icon": "memo", "kind": "tool",
+		"desc": "일할 때 꼭 챙기는 수첩. 눈여겨본 것은 여기 적어 둔다."},
 	"flashlight": {"name": "손전등", "icon": "flashlight", "kind": "tool",
 		"desc": "다용도실 선반에서 챙겼다. 불 꺼진 지하도 이게 있으면 다닐 만하다."},
 	"tape": {"name": "투명 테이프", "icon": "tape", "kind": "tool",
@@ -60,7 +62,7 @@ const DB := {
 	"silver_candle": {"name": "은촛대", "icon": "silver_candle", "kind": "loot", "value": 150,
 		"desc": "식당 식탁의 은촛대."},
 	"watch": {"name": "금 회중시계", "icon": "watch", "kind": "loot", "value": 1200,
-		"desc": "할아버지 협탁 서랍의 회중시계. 뚜껑 안쪽에 '1976. 5. 15. 순애가'라고 새겨져 있다."},
+		"desc": "할아버지 협탁 서랍의 회중시계. 뚜껑 안쪽에 '1974. 10. 3. 처음 만난 날. 순애가'라고 새겨져 있다."},
 }
 
 

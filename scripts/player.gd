@@ -18,7 +18,12 @@ func _physics_process(_delta: float) -> void:
 	if not active:
 		return
 	_track_held()
-	if not control or Game.busy > 0 or hidden_in != "":
+	if not control or Game.busy > 0:
+		return
+	if hidden_in != "":
+		# 숨어 있을 때는 조사(Z)나 취소(X)로 나온다
+		if Input.is_action_just_pressed("act") or Input.is_action_just_pressed("cancel"):
+			play.interact()
 		return
 	if Input.is_action_just_pressed("act"):
 		play.interact()
