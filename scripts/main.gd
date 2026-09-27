@@ -106,7 +106,7 @@ func show_title() -> void:
 	bg.texture = load("res://assets/art/title_bg.png")
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED   # 넓은 화면에서도 양옆에 띠가 생기지 않게
 	s.add_child(bg)
 	var col := VBoxContainer.new()
 	col.position = Vector2(35, 104)
