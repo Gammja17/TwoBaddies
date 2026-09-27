@@ -31,43 +31,43 @@ func _ready() -> void:
 	box.anchor_right = 1.0
 	box.anchor_top = 1.0
 	box.anchor_bottom = 1.0
-	box.offset_left = 8
-	box.offset_right = -8
-	box.offset_top = -78
-	box.offset_bottom = -6
+	box.offset_left = 10
+	box.offset_right = -10
+	box.offset_top = -104
+	box.offset_bottom = -8
 	box.mouse_filter = Control.MOUSE_FILTER_STOP
 	box.gui_input.connect(_on_box_input)
 	add_child(box)
 	portrait = TextureRect.new()
-	portrait.position = Vector2(6, 4)
-	portrait.size = Vector2(64, 64)
+	portrait.position = Vector2(6, 6)
+	portrait.size = Vector2(84, 84)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_SCALE
 	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	box.add_child(portrait)
-	text = UI.rich(12)
+	text = UI.rich(UI.BODY)
 	text.anchor_right = 1.0
-	text.offset_left = 78
-	text.offset_top = 7
-	text.offset_right = -14
-	text.offset_bottom = 67
+	text.offset_left = 102
+	text.offset_top = 10
+	text.offset_right = -20
+	text.offset_bottom = 90
 	box.add_child(text)
-	arrow = UI.label("▼", 10, UI.GOLD, true)
+	arrow = UI.label("▼", UI.SMALL, UI.GOLD, true)
 	arrow.anchor_left = 1.0
 	arrow.anchor_right = 1.0
 	arrow.anchor_top = 1.0
 	arrow.anchor_bottom = 1.0
-	arrow.offset_left = -16
-	arrow.offset_top = -16
+	arrow.offset_left = -20
+	arrow.offset_top = -20
 	box.add_child(arrow)
-	name_tag = UI.panel(Rect2(0, 0, 90, 17))
+	name_tag = UI.panel(Rect2(0, 0, 120, 24))
 	name_tag.anchor_top = 1.0
 	name_tag.anchor_bottom = 1.0
-	name_tag.offset_top = -95
-	name_tag.offset_bottom = -78
+	name_tag.offset_top = -127
+	name_tag.offset_bottom = -104
 	add_child(name_tag)
-	name_label = UI.label("", 12)
-	name_label.position = Vector2(6, 1)
+	name_label = UI.label("", UI.BODY)
+	name_label.position = Vector2(9, 2)
 	name_tag.add_child(name_label)
 	choice_panel = UI.panel(Rect2())
 	choice_panel.anchor_left = 1.0
@@ -119,14 +119,14 @@ func choose(options: Array, disabled: Array = []) -> int:
 	menu.setup(options, false, disabled)
 	var widest := 0.0
 	for o in options:
-		widest = max(widest, Art.font_main.get_string_size("▶ " + str(o), HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x)
-	var w: float = min(widest + 20.0, get_viewport_rect().size.x - 24.0)
-	var h := options.size() * 18.0 + 10.0
-	choice_panel.offset_left = -8 - w
-	choice_panel.offset_right = -8
-	choice_panel.offset_top = -84 - h
-	choice_panel.offset_bottom = -84
-	menu.position = Vector2(6, 5)
+		widest = max(widest, Art.font_main.get_string_size("▶ " + str(o), HORIZONTAL_ALIGNMENT_LEFT, -1, UI.BODY).x)
+	var w: float = min(widest + 26.0, get_viewport_rect().size.x - 30.0)
+	var h := options.size() * 21.0 + 12.0
+	choice_panel.offset_left = -10 - w
+	choice_panel.offset_right = -10
+	choice_panel.offset_top = -112 - h
+	choice_panel.offset_bottom = -112
+	menu.position = Vector2(8, 6)
 	choice_panel.add_child(menu)
 	choice_panel.visible = true
 	arrow.visible = false
@@ -147,7 +147,7 @@ func _show_speaker(who: String, expr: String) -> void:
 	portrait.visible = has_face
 	if has_face:
 		portrait.texture = Art.portrait("crook" if who.begins_with("crook") else "thief", expr)
-	text.offset_left = 78 if has_face else 12
+	text.offset_left = 102 if has_face else 16
 	if sp.is_empty():
 		name_tag.visible = false
 		text.add_theme_color_override("default_color", UI.TEXT if who != "narr" else Color(0.85, 0.82, 0.78))
@@ -156,8 +156,8 @@ func _show_speaker(who: String, expr: String) -> void:
 	name_tag.visible = true
 	name_label.text = sp["name"]
 	name_label.add_theme_color_override("font_color", sp["color"])
-	var w := Art.font_main.get_string_size(sp["name"], HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 14
-	name_tag.offset_left = 8 + (70 if has_face else 0)
+	var w := Art.font_main.get_string_size(sp["name"], HORIZONTAL_ALIGNMENT_LEFT, -1, UI.BODY).x + 18
+	name_tag.offset_left = 10 + (92 if has_face else 0)
 	name_tag.offset_right = name_tag.offset_left + w
 
 

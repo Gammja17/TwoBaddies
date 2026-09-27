@@ -11,6 +11,10 @@ const GOLD := Color(0.93, 0.78, 0.42)
 const RED := Color(0.90, 0.40, 0.35)
 const GREEN := Color(0.52, 0.82, 0.55)
 const BLUE := Color(0.62, 0.72, 0.88)
+## 글자 크기 (갈무리 글꼴이 또렷하게 나오는 크기)
+const BODY := 15     # Galmuri14
+const SMALL := 12    # Galmuri11
+const BIG := 30      # Galmuri14 두 배
 
 const SPEAKERS := {
 	"thief": {"name": "오만복", "color": Color(0.62, 0.72, 0.88)},
@@ -43,7 +47,7 @@ static func panel(rect: Rect2, bg := BG, edge := EDGE) -> Panel:
 	return p
 
 
-static func label(text: String, size := 12, color := TEXT, small := false) -> Label:
+static func label(text: String, size := BODY, color := TEXT, small := false) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_font_override("font", Art.font_small if small else Art.font_main)
@@ -53,7 +57,7 @@ static func label(text: String, size := 12, color := TEXT, small := false) -> La
 	return l
 
 
-static func rich(size := 12) -> RichTextLabel:
+static func rich(size := BODY) -> RichTextLabel:
 	var r := RichTextLabel.new()
 	r.bbcode_enabled = true
 	r.scroll_active = false
@@ -81,12 +85,12 @@ class Menu extends VBoxContainer:
 	var index := 0
 	var enabled: Array = []
 	var allow_cancel := true
-	var font_size := 12
+	var font_size := UI.BODY
 
 	func setup(options: Array, can_cancel := true, disabled: Array = []) -> void:
 		items = options
 		allow_cancel = can_cancel
-		add_theme_constant_override("separation", 2)
+		add_theme_constant_override("separation", 3)
 		for i in options.size():
 			var l := UI.label("", font_size)
 			l.mouse_filter = Control.MOUSE_FILTER_STOP

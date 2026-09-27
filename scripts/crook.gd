@@ -181,6 +181,9 @@ func can_see_player() -> bool:
 		return true
 	if dist > SIGHT:
 		return false
+	# 화면(가로 20칸, 세로 11칸) 밖에서는 못 본다: 도둑이 못 보는 곳에서 먼저 들키지 않게
+	if abs(d.x) > 9 or abs(d.y) > 5:
+		return false
 	var shared := false
 	var his := world.rooms_touching(p.cell)
 	for r in world.rooms_touching(cell):
@@ -525,7 +528,7 @@ func _tick_chase(delta: float) -> void:
 			_searching = false
 			play.chase_ended()
 			return
-	if p.hidden_in == "" and position.distance_to(p.position) <= 17.0:
+	if p.hidden_in == "" and position.distance_to(p.position) <= 34.0:
 		face(Vector2i(signi(p.cell.x - cell.x), 0) if p.cell.x != cell.x else Vector2i(0, signi(p.cell.y - cell.y)))
 		caught_player.emit()
 		return
@@ -577,7 +580,7 @@ func knock_down(state: String, secs := 0.0) -> void:
 		visible = false
 		return
 	sprite.rotation_degrees = 90
-	sprite.offset = Vector2(-20, -10)
+	sprite.offset = Vector2(-40, -20)
 	sprite.modulate = Color(0.55, 0.5, 0.5) if state == "dead" else Color(0.8, 0.8, 0.85)
 
 
@@ -590,7 +593,7 @@ func _tick_down(delta: float) -> void:
 
 func get_up() -> void:
 	sprite.rotation_degrees = 0
-	sprite.offset = Vector2(-8, -24)
+	sprite.offset = Vector2(-16, -48)
 	sprite.modulate = Color.WHITE
 	var was := Game.crook_state
 	Game.crook_state = "free"

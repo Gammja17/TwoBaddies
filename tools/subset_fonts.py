@@ -28,7 +28,7 @@ def main():
     chars |= {chr(c) for c in range(0x3131, 0x318F)}
     chars |= set("▶▼▲◀■□…'\"“”‘’")
     text = "".join(sorted(chars))
-    for name in ("Galmuri11", "Galmuri9"):
+    for name in ("Galmuri14", "Galmuri11"):
         font = TTFont(os.path.join(ROOT, "_packs", "galmuri", name + ".ttf"))
         opts = subset.Options()
         opts.layout_features = ["*"]

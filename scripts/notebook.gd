@@ -28,25 +28,25 @@ func open(lines: Array) -> void:
 	p.anchor_right = 0.5
 	p.anchor_top = 0.5
 	p.anchor_bottom = 0.5
-	p.offset_left = -210
-	p.offset_right = 210
-	p.offset_top = -118
-	p.offset_bottom = 110
+	p.offset_left = -280
+	p.offset_right = 280
+	p.offset_top = -157
+	p.offset_bottom = 147
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(p)
-	var title := UI.label("만복의 수첩", 12, UI.GOLD)
-	title.position = Vector2(10, 5)
+	var title := UI.label("만복의 수첩", UI.BODY, UI.GOLD)
+	title.position = Vector2(13, 7)
 	p.add_child(title)
-	var close_btn := UI.label("닫기", 12, UI.GOLD)
-	close_btn.position = Vector2(376, 4)
+	var close_btn := UI.label("닫기", UI.BODY, UI.GOLD)
+	close_btn.position = Vector2(501, 6)
 	close_btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	close_btn.gui_input.connect(func(ev: InputEvent):
 		if (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT) or (ev is InputEventScreenTouch and ev.pressed):
 			_close())
 	p.add_child(close_btn)
-	_body = UI.rich(12)
-	_body.position = Vector2(10, 26)
-	_body.size = Vector2(400, 176)
+	_body = UI.rich(UI.BODY)
+	_body.position = Vector2(13, 35)
+	_body.size = Vector2(534, 234)
 	_body.scroll_active = true
 	_body.mouse_filter = Control.MOUSE_FILTER_STOP
 	var parts := []
@@ -54,8 +54,8 @@ func open(lines: Array) -> void:
 		parts.append("[color=#eec76b]%s[/color]\n%s" % [l[0], l[1]])
 	_body.text = "\n\n".join(parts) if parts.size() > 0 else "[color=#a8a095]아직 적은 게 없다. 눈여겨볼 만한 걸 보면 여기 적는다.[/color]"
 	p.add_child(_body)
-	var help := UI.label("[위아래] 넘기기   [X] 닫기", 10, UI.DIM, true)
-	help.position = Vector2(10, 206)
+	var help := UI.label("[위아래] 넘기기   [X] 닫기", UI.SMALL, UI.DIM, true)
+	help.position = Vector2(13, 275)
 	p.add_child(help)
 	visible = true
 	_active = true

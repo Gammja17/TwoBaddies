@@ -26,7 +26,7 @@ func setup(w: World, name: String, c: Vector2i, face := Vector2i.DOWN) -> void:
 	sprite = AnimatedSprite2D.new()
 	sprite.sprite_frames = Art.char_frames(name)
 	sprite.centered = false
-	sprite.offset = Vector2(-8, -24)
+	sprite.offset = Vector2(-16, -48)
 	add_child(sprite)
 	world.ysort.add_child(self)
 	world.actors.append(self)
@@ -96,21 +96,20 @@ func front() -> Vector2i:
 	return cell + facing
 
 
-## 머리 위 말풍선 (대화창을 열지 않는 짧은 혼잣말).
+## 머리 위 말풍선 (대화창을 열지 않는 짧은 혼잣말). 밤의 어둠에 묻히지 않게 따로 그린다.
 func bark(text: String, secs := 2.2) -> void:
 	if _bubble == null:
 		_bubble = Label.new()
 		_bubble.add_theme_font_override("font", Art.font_small)
-		_bubble.add_theme_font_size_override("font_size", 10)
+		_bubble.add_theme_font_size_override("font_size", 12)
 		_bubble.add_theme_color_override("font_color", Color(1, 0.97, 0.9))
 		_bubble.add_theme_color_override("font_outline_color", Color(0.1, 0.08, 0.12))
-		_bubble.add_theme_constant_override("outline_size", 3)
+		_bubble.add_theme_constant_override("outline_size", 4)
 		_bubble.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_bubble.z_index = 60
-		add_child(_bubble)
+		world.overlay.add_child(_bubble)
 	_bubble.text = text
 	_bubble.reset_size()
-	_bubble.position = Vector2(-_bubble.size.x / 2.0, -38)
+	_place_bubble()
 	_bubble.visible = true
 	var t := get_tree().create_timer(secs)
 	_bubble_timer = t
@@ -122,6 +121,21 @@ func bark(text: String, secs := 2.2) -> void:
 func hide_bubble() -> void:
 	if _bubble:
 		_bubble.visible = false
+
+
+func _place_bubble() -> void:
+	_bubble.position = (position + Vector2(-_bubble.size.x / 2.0, -72)).round()
+
+
+func _process(_delta: float) -> void:
+	if _bubble and _bubble.visible:
+		_bubble.visible = visible
+		_place_bubble()
+
+
+func _exit_tree() -> void:
+	if is_instance_valid(_bubble):
+		_bubble.queue_free()
 
 
 func set_hidden(spot: String) -> void:

@@ -38,29 +38,29 @@ func open() -> Dictionary:
 	p.anchor_right = 0.5
 	p.anchor_top = 0.5
 	p.anchor_bottom = 0.5
-	p.offset_left = -210
-	p.offset_right = 210
-	p.offset_top = -118
-	p.offset_bottom = 110
+	p.offset_left = -280
+	p.offset_right = 280
+	p.offset_top = -157
+	p.offset_bottom = 147
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(p)
-	var title := UI.label("주머니", 12, UI.GOLD)
-	title.position = Vector2(10, 5)
+	var title := UI.label("주머니", UI.BODY, UI.GOLD)
+	title.position = Vector2(13, 7)
 	p.add_child(title)
-	_money = UI.label("", 12, UI.TEXT)
-	_money.position = Vector2(70, 5)
+	_money = UI.label("", UI.BODY, UI.TEXT)
+	_money.position = Vector2(93, 7)
 	p.add_child(_money)
-	_rel = UI.label("", 10, UI.DIM, true)
-	_rel.position = Vector2(10, 22)
+	_rel = UI.label("", UI.SMALL, UI.DIM, true)
+	_rel.position = Vector2(13, 30)
 	p.add_child(_rel)
 	var sc := ScrollContainer.new()
-	sc.position = Vector2(8, 40)
-	sc.size = Vector2(170, 162)
+	sc.position = Vector2(11, 53)
+	sc.size = Vector2(227, 216)
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	p.add_child(sc)
 	_list = VBoxContainer.new()
-	_list.add_theme_constant_override("separation", 1)
-	_list.custom_minimum_size = Vector2(160, 0)
+	_list.add_theme_constant_override("separation", 2)
+	_list.custom_minimum_size = Vector2(213, 0)
 	sc.add_child(_list)
 	for i in _ids.size():
 		var id: String = _ids[i]
@@ -68,10 +68,10 @@ func open() -> Dictionary:
 		row.mouse_filter = Control.MOUSE_FILTER_STOP
 		var icon := TextureRect.new()
 		icon.texture = Art.item(Items.info(id).get("icon", id))
-		icon.custom_minimum_size = Vector2(16, 16)
+		icon.custom_minimum_size = Vector2(24, 24)
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(icon)
-		var l := UI.label(Items.name_of(id), 12)
+		var l := UI.label(Items.name_of(id), UI.BODY)
 		row.add_child(l)
 		var idx := i
 		row.gui_input.connect(func(ev: InputEvent):
@@ -85,18 +85,18 @@ func open() -> Dictionary:
 		_rows.append([row, l])
 	var line := ColorRect.new()
 	line.color = UI.EDGE
-	line.position = Vector2(186, 40)
-	line.size = Vector2(1, 162)
+	line.position = Vector2(248, 53)
+	line.size = Vector2(1, 216)
 	p.add_child(line)
-	_desc = UI.rich(12)
-	_desc.position = Vector2(196, 40)
-	_desc.size = Vector2(214, 150)
+	_desc = UI.rich(UI.BODY)
+	_desc.position = Vector2(261, 53)
+	_desc.size = Vector2(285, 200)
 	p.add_child(_desc)
-	var help := UI.label("[Z] 쓰기, 읽기   [X] 닫기", 10, UI.DIM, true)
-	help.position = Vector2(196, 206)
+	var help := UI.label("[Z] 쓰기, 읽기   [X] 닫기", UI.SMALL, UI.DIM, true)
+	help.position = Vector2(261, 275)
 	p.add_child(help)
-	var close_btn := UI.label("닫기", 12, UI.GOLD)
-	close_btn.position = Vector2(376, 4)
+	var close_btn := UI.label("닫기", UI.BODY, UI.GOLD)
+	close_btn.position = Vector2(501, 6)
 	close_btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	close_btn.gui_input.connect(func(ev: InputEvent):
 		if (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT) or (ev is InputEventScreenTouch and ev.pressed):
@@ -169,14 +169,14 @@ func _act() -> void:
 	_action_panel = UI.panel(Rect2())
 	_action_panel.anchor_left = 0.5
 	_action_panel.anchor_top = 0.5
-	_action_panel.offset_left = -20
-	_action_panel.offset_top = 40
-	_action_panel.offset_right = 110
-	_action_panel.offset_bottom = 40 + acts.size() * 18 + 10
+	_action_panel.offset_left = -27
+	_action_panel.offset_top = 53
+	_action_panel.offset_right = 147
+	_action_panel.offset_bottom = 53 + acts.size() * 21 + 12
 	add_child(_action_panel)
 	_action_menu = UI.Menu.new()
 	_action_menu.setup(acts, true)
-	_action_menu.position = Vector2(6, 5)
+	_action_menu.position = Vector2(8, 6)
 	_action_panel.add_child(_action_menu)
 	_active = false
 	_action_menu.picked.connect(func(i: int): _finish({"item": id, "action": acts[i]}))

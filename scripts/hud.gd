@@ -24,20 +24,20 @@ func _init() -> void:
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	clock_panel = UI.panel(Rect2(6, 6, 92, 34))
+	clock_panel = UI.panel(Rect2(8, 8, 128, 44))
 	add_child(clock_panel)
-	clock_label = UI.label("02:10", 12, UI.TEXT)
-	clock_label.position = Vector2(7, 2)
+	clock_label = UI.label("02:10", UI.BODY, UI.TEXT)
+	clock_label.position = Vector2(9, 3)
 	clock_panel.add_child(clock_label)
-	left_label = UI.label("", 10, UI.DIM, true)
-	left_label.position = Vector2(7, 18)
+	left_label = UI.label("", UI.SMALL, UI.DIM, true)
+	left_label.position = Vector2(9, 24)
 	clock_panel.add_child(left_label)
 	clock_panel.visible = false
 
-	room_label = UI.outline(UI.label("", 12, UI.TEXT))
+	room_label = UI.outline(UI.label("", UI.BODY, UI.TEXT))
 	room_label.anchor_left = 0.5
 	room_label.anchor_right = 0.5
-	room_label.offset_top = 8
+	room_label.offset_top = 11
 	room_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	room_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	room_label.modulate.a = 0.0
@@ -46,7 +46,7 @@ func _ready() -> void:
 	toast_box = VBoxContainer.new()
 	toast_box.anchor_left = 0.5
 	toast_box.anchor_right = 0.5
-	toast_box.offset_top = 26
+	toast_box.offset_top = 35
 	toast_box.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	toast_box.alignment = BoxContainer.ALIGNMENT_BEGIN
 	toast_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -57,20 +57,20 @@ func _ready() -> void:
 	hint_panel.anchor_right = 0.5
 	hint_panel.anchor_top = 1.0
 	hint_panel.anchor_bottom = 1.0
-	hint_panel.offset_top = -30
-	hint_panel.offset_bottom = -10
+	hint_panel.offset_top = -40
+	hint_panel.offset_bottom = -13
 	add_child(hint_panel)
-	hint_label = UI.label("", 12, UI.GOLD)
-	hint_label.position = Vector2(8, 2)
+	hint_label = UI.label("", UI.BODY, UI.GOLD)
+	hint_label.position = Vector2(10, 4)
 	hint_panel.add_child(hint_label)
 	hint_panel.visible = false
 
-	hide_label = UI.outline(UI.label("숨어 있다. [Z] 나가기", 12, UI.BLUE))
+	hide_label = UI.outline(UI.label("숨어 있다. [Z] 나가기", UI.BODY, UI.BLUE))
 	hide_label.anchor_left = 0.5
 	hide_label.anchor_right = 0.5
 	hide_label.anchor_top = 1.0
 	hide_label.anchor_bottom = 1.0
-	hide_label.offset_top = -52
+	hide_label.offset_top = -70
 	hide_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	hide_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hide_label.visible = false
@@ -81,23 +81,23 @@ func _ready() -> void:
 	work_panel.anchor_right = 0.5
 	work_panel.anchor_top = 0.5
 	work_panel.anchor_bottom = 0.5
-	work_panel.offset_left = -80
-	work_panel.offset_right = 80
-	work_panel.offset_top = 24
-	work_panel.offset_bottom = 58
+	work_panel.offset_left = -107
+	work_panel.offset_right = 107
+	work_panel.offset_top = 32
+	work_panel.offset_bottom = 78
 	add_child(work_panel)
-	work_label = UI.label("", 12)
-	work_label.position = Vector2(8, 3)
+	work_label = UI.label("", UI.BODY)
+	work_label.position = Vector2(10, 4)
 	work_panel.add_child(work_label)
 	work_bar = ColorRect.new()
 	work_bar.color = UI.INNER
-	work_bar.position = Vector2(8, 21)
-	work_bar.size = Vector2(144, 6)
+	work_bar.position = Vector2(10, 29)
+	work_bar.size = Vector2(194, 8)
 	work_panel.add_child(work_bar)
 	work_fill = ColorRect.new()
 	work_fill.color = UI.GOLD
-	work_fill.position = Vector2(8, 21)
-	work_fill.size = Vector2(0, 6)
+	work_fill.position = Vector2(10, 29)
+	work_fill.size = Vector2(0, 8)
 	work_panel.add_child(work_fill)
 	work_panel.visible = false
 
@@ -140,7 +140,7 @@ func show_room(name: String) -> void:
 
 
 func toast(text: String, color := UI.TEXT) -> void:
-	var l := UI.outline(UI.label(text, 12, color))
+	var l := UI.outline(UI.label(text, UI.BODY, color))
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	toast_box.add_child(l)
 	var tw := create_tween()
@@ -156,7 +156,7 @@ func hint(text: String) -> void:
 		hint_panel.visible = false
 		return
 	hint_label.text = text
-	var w := Art.font_main.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 16
+	var w := Art.font_main.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, UI.BODY).x + 20
 	hint_panel.offset_left = -w / 2.0
 	hint_panel.offset_right = w / 2.0
 	hint_panel.visible = true
@@ -173,7 +173,7 @@ func work_begin(text: String) -> void:
 
 
 func work_progress(f: float) -> void:
-	work_fill.size.x = 144.0 * clampf(f, 0.0, 1.0)
+	work_fill.size.x = 194.0 * clampf(f, 0.0, 1.0)
 
 
 func work_end() -> void:

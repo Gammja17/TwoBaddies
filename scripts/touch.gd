@@ -10,13 +10,13 @@ func _ready() -> void:
 		visible = false
 		set_process(false)
 		return
-	var r := 17
+	var r := 23
 	for a in ["up", "down", "left", "right"]:
 		_add(a, r, _arrow(a))
-	_add("act", 21, "A")
-	_add("run", 17, "B")
-	_add("menu", 14, "주머니", true)
-	_add("pause", 12, "II", true)
+	_add("act", 28, "A")
+	_add("run", 23, "B")
+	_add("menu", 19, "주머니", true)
+	_add("pause", 16, "II", true)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -28,7 +28,7 @@ func _add(action: String, r: int, text: String, small := false) -> void:
 	b.action = action
 	b.visibility_mode = TouchScreenButton.VISIBILITY_TOUCHSCREEN_ONLY
 	b.passby_press = action in ["up", "down", "left", "right"]
-	var l := UI.outline(UI.label(text, 10 if small else 12, UI.TEXT, small))
+	var l := UI.outline(UI.label(text, UI.SMALL if small else UI.BODY, UI.TEXT, small))
 	l.size = Vector2(r * 2, r * 2)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -62,17 +62,17 @@ func _arrow(a: String) -> String:
 
 func _layout() -> void:
 	var s := get_viewport().get_visible_rect().size
-	var cx := 52.0
-	var cy := s.y - 52.0
-	var gap := 30.0
+	var cx := 69.0
+	var cy := s.y - 69.0
+	var gap := 40.0
 	_place("up", cx, cy - gap)
 	_place("down", cx, cy + gap)
 	_place("left", cx - gap, cy)
 	_place("right", cx + gap, cy)
-	_place("act", s.x - 34, s.y - 60)
-	_place("run", s.x - 78, s.y - 34)
-	_place("menu", s.x - 58, 22)
-	_place("pause", s.x - 22, 22)
+	_place("act", s.x - 45, s.y - 80)
+	_place("run", s.x - 104, s.y - 45)
+	_place("menu", s.x - 77, 29)
+	_place("pause", s.x - 29, 29)
 
 
 func _place(action: String, x: float, y: float) -> void:

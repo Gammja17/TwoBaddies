@@ -34,7 +34,7 @@ func _process(_delta: float) -> void:
 		_rotate = ColorRect.new()
 		_rotate.color = Color(0.05, 0.045, 0.06)
 		_rotate.set_anchors_preset(Control.PRESET_FULL_RECT)
-		var l := UI.label("휴대폰을 가로로 돌려 주세요", 12, UI.GOLD)
+		var l := UI.label("휴대폰을 가로로 돌려 주세요", UI.BODY, UI.GOLD)
 		l.set_anchors_preset(Control.PRESET_CENTER)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -109,28 +109,28 @@ func show_title() -> void:
 	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	s.add_child(bg)
 	var col := VBoxContainer.new()
-	col.position = Vector2(26, 62)
-	col.add_theme_constant_override("separation", 2)
+	col.position = Vector2(35, 104)
+	col.add_theme_constant_override("separation", 3)
 	s.add_child(col)
-	col.add_child(UI.outline(UI.label("2 BADDIES", 24, UI.GOLD), 4))
-	col.add_child(UI.outline(UI.label("두 악당", 12, UI.TEXT)))
+	col.add_child(UI.outline(UI.label("2 BADDIES", UI.BIG, UI.GOLD), 5))
+	col.add_child(UI.outline(UI.label("두 악당", UI.BODY, UI.TEXT)))
 	var gap := Control.new()
-	gap.custom_minimum_size = Vector2(0, 6)
+	gap.custom_minimum_size = Vector2(0, 8)
 	col.add_child(gap)
-	col.add_child(UI.outline(UI.label("잠긴 별장에 좀도둑과 수배범.", 10, Color(0.8, 0.78, 0.74), true)))
-	col.add_child(UI.outline(UI.label("경찰이 오기까지 20분.", 10, Color(0.8, 0.78, 0.74), true)))
+	col.add_child(UI.outline(UI.label("잠긴 별장에 좀도둑과 수배범.", UI.SMALL, Color(0.86, 0.84, 0.8), true)))
+	col.add_child(UI.outline(UI.label("경찰이 오기까지 20분.", UI.SMALL, Color(0.86, 0.84, 0.8), true)))
 	var opts := ["새로 시작", "엔딩 모음 (%d / %d)" % [Game.endings.size(), Endings.ORDER.size()], "소리 설정"]
 	var m := UI.Menu.new()
 	m.setup(opts, false)
-	m.position = Vector2(24, 150)
+	m.position = Vector2(32, 222)
 	for l in m.labels:
 		UI.outline(l)
 	s.add_child(m)
-	var foot := UI.outline(UI.label("기획 이서연   그림과 소리 Kenney 외", 10, Color(0.62, 0.6, 0.58), true))
+	var foot := UI.outline(UI.label("기획 이서연   그림 VARCO, 소리 Kenney 외", UI.SMALL, Color(0.7, 0.68, 0.66), true))
 	foot.anchor_top = 1.0
 	foot.anchor_bottom = 1.0
-	foot.offset_left = 26
-	foot.offset_top = -18
+	foot.offset_left = 35
+	foot.offset_top = -24
 	s.add_child(foot)
 	var i: int = await m.picked
 	match i:
@@ -148,13 +148,13 @@ func _ask_start() -> void:
 		start_run(false)
 		return
 	var s := _new_screen()
-	var q := UI.label("어디서부터 시작할까요?", 12)
-	_centered(q, 90)
+	var q := UI.label("어디서부터 시작할까요?", UI.BODY)
+	_centered(q, 120)
 	s.add_child(q)
 	var m := UI.Menu.new()
 	m.setup(["경보가 울리는 순간부터", "잠입 연습부터 (조작 배우기)"], true)
-	_centered(m, 116)
-	m.offset_left = -90
+	_centered(m, 155)
+	m.offset_left = -120
 	s.add_child(m)
 	m.cancelled.connect(show_title)
 	var i: int = await m.picked
@@ -191,20 +191,20 @@ func show_ending(id: String, fresh: bool) -> void:
 	Sfx.music("title" if tone != "bad" else "")
 	Sfx.play({"good": "jingle_sax_a", "mid": "jingle_steel", "bad": "jingle_bad"}[tone])
 	var s := _new_screen()
-	var num := UI.label("엔딩 %d / %d%s" % [Endings.number(id), Endings.ORDER.size(), "   새로 찾음!" if fresh else ""], 10, UI.GOLD if fresh else UI.DIM, true)
-	_centered(num, 18)
+	var num := UI.label("엔딩 %d / %d%s" % [Endings.number(id), Endings.ORDER.size(), "   새로 찾음!" if fresh else ""], UI.SMALL, UI.GOLD if fresh else UI.DIM, true)
+	_centered(num, 24)
 	s.add_child(num)
 	var col: Color = {"good": UI.GOLD, "mid": UI.BLUE, "bad": UI.RED}[tone]
-	var title := UI.outline(UI.label(Endings.TITLE[id], 24, col), 4)
-	_centered(title, 34)
+	var title := UI.outline(UI.label(Endings.TITLE[id], UI.BIG, col), 5)
+	_centered(title, 44)
 	s.add_child(title)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 8)
+	box.add_theme_constant_override("separation", 11)
 	box.anchor_left = 0.5
 	box.anchor_right = 0.5
-	box.offset_left = -200
-	box.offset_right = 200
-	box.offset_top = 74
+	box.offset_left = -267
+	box.offset_right = 267
+	box.offset_top = 99
 	s.add_child(box)
 	var skip := [false]
 	var catcher := Control.new()
@@ -215,10 +215,10 @@ func show_ending(id: String, fresh: bool) -> void:
 			skip[0] = true)
 	s.add_child(catcher)
 	for line in Endings.lines(id):
-		var r := UI.rich(12)
+		var r := UI.rich(UI.BODY)
 		r.text = line
 		r.fit_content = true
-		r.custom_minimum_size = Vector2(400, 0)
+		r.custom_minimum_size = Vector2(534, 0)
 		r.modulate.a = 0.0
 		box.add_child(r)
 		var tw := create_tween()
@@ -231,10 +231,10 @@ func show_ending(id: String, fresh: bool) -> void:
 				skip[0] = true
 		r.modulate.a = 1.0
 	catcher.queue_free()
-	var stats := UI.label(_stats_line(), 10, UI.DIM, true)
+	var stats := UI.label(_stats_line(), UI.SMALL, UI.DIM, true)
 	stats.anchor_top = 1.0
 	stats.anchor_bottom = 1.0
-	_centered(stats, -62)
+	_centered(stats, -83)
 	stats.anchor_top = 1.0
 	s.add_child(stats)
 	var m := UI.Menu.new()
@@ -242,8 +242,8 @@ func show_ending(id: String, fresh: bool) -> void:
 	m.anchor_top = 1.0
 	m.anchor_bottom = 1.0
 	m.anchor_left = 0.5
-	m.offset_left = -40
-	m.offset_top = -46
+	m.offset_left = -53
+	m.offset_top = -61
 	s.add_child(m)
 	var i: int = await m.picked
 	match i:
@@ -270,32 +270,32 @@ func _stats_line() -> String:
 func show_gallery() -> void:
 	Engine.max_fps = 30
 	var s := _new_screen()
-	var t := UI.label("엔딩 모음  %d / %d" % [Game.endings.size(), Endings.ORDER.size()], 12, UI.GOLD)
-	t.position = Vector2(16, 10)
+	var t := UI.label("엔딩 모음  %d / %d" % [Game.endings.size(), Endings.ORDER.size()], UI.BODY, UI.GOLD)
+	t.position = Vector2(21, 13)
 	s.add_child(t)
 	var names := []
 	for i in Endings.ORDER.size():
 		var id: String = Endings.ORDER[i]
 		names.append("%02d  %s" % [i + 1, Endings.TITLE[id] if Game.endings.has(id) else "???"])
 	var m := UI.Menu.new()
-	m.font_size = 12
+	m.font_size = UI.BODY
 	m.setup(names, true)
-	m.position = Vector2(14, 30)
+	m.position = Vector2(19, 40)
 	m.add_theme_constant_override("separation", 0)
 	s.add_child(m)
-	var detail := UI.rich(12)
+	var detail := UI.rich(UI.BODY)
 	detail.anchor_left = 0.5
 	detail.anchor_right = 1.0
-	detail.offset_left = 10
-	detail.offset_right = -16
-	detail.offset_top = 40
-	detail.offset_bottom = 220
+	detail.offset_left = 13
+	detail.offset_right = -21
+	detail.offset_top = 53
+	detail.offset_bottom = 293
 	s.add_child(detail)
-	var help := UI.label("[X] 돌아가기", 10, UI.DIM, true)
+	var help := UI.label("[X] 돌아가기", UI.SMALL, UI.DIM, true)
 	help.anchor_top = 1.0
 	help.anchor_bottom = 1.0
-	help.offset_left = 16
-	help.offset_top = -18
+	help.offset_left = 21
+	help.offset_top = -24
 	s.add_child(help)
 	var upd := func():
 		var id: String = Endings.ORDER[m.index]
@@ -322,21 +322,21 @@ func _sound_settings(parent: Control) -> void:
 	p.anchor_right = 0.5
 	p.anchor_top = 0.5
 	p.anchor_bottom = 0.5
-	p.offset_left = -110
-	p.offset_right = 110
-	p.offset_top = -50
-	p.offset_bottom = 56
+	p.offset_left = -147
+	p.offset_right = 147
+	p.offset_top = -67
+	p.offset_bottom = 75
 	parent.add_child(p)
 	var buses := ["Master", "Music", "SFX"]
 	var names := {"Master": "전체", "Music": "음악", "SFX": "효과음"}
 	var rows: Array[Label] = []
 	for i in 3:
-		var l := UI.label("", 12)
-		l.position = Vector2(12, 10 + i * 20)
+		var l := UI.label("", UI.BODY)
+		l.position = Vector2(16, 13 + i * 27)
 		p.add_child(l)
 		rows.append(l)
-	var help := UI.label("위아래로 고르고 좌우로 조절, [X] 닫기", 10, UI.DIM, true)
-	help.position = Vector2(12, 78)
+	var help := UI.label("위아래로 고르고 좌우로 조절, [X] 닫기", UI.SMALL, UI.DIM, true)
+	help.position = Vector2(16, 104)
 	p.add_child(help)
 	var sel := [0]
 	var draw := func():
@@ -392,17 +392,17 @@ func _open_pause() -> void:
 	box.anchor_right = 0.5
 	box.anchor_top = 0.5
 	box.anchor_bottom = 0.5
-	box.offset_left = -70
-	box.offset_right = 70
-	box.offset_top = -52
-	box.offset_bottom = 44
+	box.offset_left = -93
+	box.offset_right = 93
+	box.offset_top = -69
+	box.offset_bottom = 59
 	pause_panel.add_child(box)
-	var t := UI.label("멈춤", 12, UI.GOLD)
-	t.position = Vector2(12, 8)
+	var t := UI.label("멈춤", UI.BODY, UI.GOLD)
+	t.position = Vector2(16, 11)
 	box.add_child(t)
 	var m := UI.Menu.new()
 	m.setup(["계속하기", "소리 설정", "첫 화면으로"], true)
-	m.position = Vector2(12, 30)
+	m.position = Vector2(16, 40)
 	box.add_child(m)
 	m.cancelled.connect(func():
 		m.picked.emit(0))

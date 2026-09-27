@@ -38,29 +38,29 @@ func open(title: String, n: int) -> String:
 	p.anchor_right = 0.5
 	p.anchor_top = 0.5
 	p.anchor_bottom = 0.5
-	p.offset_left = -78
-	p.offset_right = 78
-	p.offset_top = -100
-	p.offset_bottom = 96
+	p.offset_left = -104
+	p.offset_right = 104
+	p.offset_top = -133
+	p.offset_bottom = 128
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(p)
-	var t := UI.label(title, 12, UI.GOLD)
-	t.position = Vector2(10, 5)
+	var t := UI.label(title, UI.BODY, UI.GOLD)
+	t.position = Vector2(13, 7)
 	p.add_child(t)
 	var screen := ColorRect.new()
 	screen.color = Color(0.11, 0.17, 0.14)
-	screen.position = Vector2(10, 24)
-	screen.size = Vector2(136, 22)
+	screen.position = Vector2(13, 32)
+	screen.size = Vector2(182, 29)
 	p.add_child(screen)
-	_display = UI.label("", 12, Color(0.55, 0.9, 0.6))
-	_display.position = Vector2(18, 28)
+	_display = UI.label("", UI.BODY, Color(0.55, 0.9, 0.6))
+	_display.position = Vector2(24, 37)
 	p.add_child(_display)
 	for i in KEYS.size():
-		var l := UI.label(KEYS[i], 12)
+		var l := UI.label(KEYS[i], UI.BODY)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		l.size = Vector2(42, 26)
-		l.position = Vector2(10 + (i % 3) * 46, 54 + (i / 3) * 30)
+		l.size = Vector2(56, 35)
+		l.position = Vector2(13 + (i % 3) * 61, 72 + (i / 3) * 40)
 		l.mouse_filter = Control.MOUSE_FILTER_STOP
 		var bg := StyleBoxFlat.new()
 		bg.bg_color = UI.INNER
@@ -75,8 +75,8 @@ func open(title: String, n: int) -> String:
 				_press(KEYS[idx]))
 		p.add_child(l)
 		_buttons.append(l)
-	var help := UI.label("[X] 닫기", 10, UI.GOLD, true)
-	help.position = Vector2(10, 176)
+	var help := UI.label("[X] 닫기", UI.SMALL, UI.GOLD, true)
+	help.position = Vector2(13, 236)
 	help.mouse_filter = Control.MOUSE_FILTER_STOP
 	help.gui_input.connect(func(ev: InputEvent):
 		if (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT) or (ev is InputEventScreenTouch and ev.pressed):

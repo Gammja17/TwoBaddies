@@ -36,7 +36,7 @@ func setup(skip_prologue: bool) -> void:
 	player.setup(world, "thief", world.world_cell("1F", 4, 20), Vector2i.UP)
 	camera = Camera2D.new()
 	player.add_child(camera)
-	camera.position = Vector2(0, -8)
+	camera.position = Vector2(0, -16)
 	crook = CrookScript.new()
 	crook.play = self
 	crook.setup(world, "crook", world.world_cell("2F", 3, 15), Vector2i.DOWN)
@@ -216,7 +216,7 @@ func _update_room() -> void:
 		camera.limit_left = int(r.position.x)
 		camera.limit_top = int(r.position.y)
 		camera.limit_right = int(r.end.x)
-		camera.limit_bottom = int(r.end.y) + 40
+		camera.limit_bottom = int(r.end.y) + 80
 	var rooms := world.rooms_touching(player.cell)
 	if rooms.size() == 1 and rooms[0] != _room:
 		_room = rooms[0]

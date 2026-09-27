@@ -5,7 +5,7 @@ extends RefCounted
 const DB := {
 	"lockpick": {"name": "자물쇠 따개", "icon": "lockpick", "kind": "tool",
 		"desc": "만복의 밥줄. 서랍이나 보석함 정도의 작은 자물쇠는 이걸로 딴다."},
-	"notebook": {"name": "만복의 수첩", "icon": "memo", "kind": "tool",
+	"notebook": {"name": "만복의 수첩", "icon": "notebook", "kind": "tool",
 		"desc": "일할 때 꼭 챙기는 수첩. 눈여겨본 것은 여기 적어 둔다."},
 	"flashlight": {"name": "손전등", "icon": "flashlight", "kind": "tool",
 		"desc": "다용도실 선반에서 챙겼다. 불 꺼진 지하도 이게 있으면 다닐 만하다."},
@@ -13,7 +13,7 @@ const DB := {
 		"desc": "서재 책상에 있던 테이프. 끈적한 면에 지문이 잘 묻어난다."},
 	"compact": {"name": "분첩", "icon": "compact", "kind": "tool",
 		"desc": "할머니 화장대의 분첩. 고운 가루가 들어 있다. 지문 위에 뿌리면 무늬가 드러난다."},
-	"ash": {"name": "벽난로 재 한 줌", "icon": "compact", "kind": "tool",
+	"ash": {"name": "벽난로 재 한 줌", "icon": "ash", "kind": "tool",
 		"desc": "벽난로에서 긁어 온 고운 재. 분가루 대신 쓸 수 있다."},
 	"fingerprint": {"name": "할아버지 지문 테이프", "icon": "fingerprint", "kind": "tool",
 		"desc": "가루를 뿌려 드러난 지문을 테이프로 떠 냈다. 현관 인식기에 대 보면 된다."},

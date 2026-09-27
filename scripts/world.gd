@@ -3,14 +3,40 @@ extends Node2D
 ## 저택: 층별 지도(data/map.txt), 가구(data/objects.json), 길찾기, 방, 안개.
 ## 모든 층을 한 격자에 세로로 쌓아 둔다 (1F 위, 2F 가운데, B1 아래).
 
-const T := 16
+const T := 32
 const FLOOR_ORIGIN := {"1F": Vector2i(0, 0), "2F": Vector2i(0, 30), "B1": Vector2i(0, 56)}
-const WALL_SET := {"1F": "beige", "2F": "beige", "B1": "grey"}
-const FLOOR_TILE := {".": "floor_wood", ",": "floor_tile", ":": "floor_plank", "_": "floor_stone",
-		"g": "grass", "p": "dirt", "B": "floor_tile", "O": "floor_wood"}
+const WALL_SET := {"1F": "house", "2F": "house", "B1": "cellar"}
 const WALKABLE := ".,:_gpDBO"
-const TINT := {"1F": Color(0.80, 0.83, 0.98), "2F": Color(0.80, 0.83, 0.98), "B1": Color(0.60, 0.60, 0.70),
-		"yard": Color(0.55, 0.62, 0.85)}
+## 밤의 어둠 (층마다). 불빛 둘레만 밝다.
+const TINT := {"1F": Color(0.50, 0.53, 0.72), "2F": Color(0.50, 0.53, 0.72), "B1": Color(0.40, 0.40, 0.50),
+		"yard": Color(0.44, 0.51, 0.78)}
+## 방마다 바닥 무늬와 벽지
+const ROOM_STYLE := {
+	"식료품 창고": ["floor_checker", "wall_subway"], "주방": ["floor_checker", "wall_subway"],
+	"식당": ["floor_honey", "wall_burgundy"], "거실": ["floor_parquet", "wall_stripe"],
+	"다용도실": ["floor_lino", "wall_paint"], "보안실": ["floor_lino", "wall_paint"],
+	"현관": ["floor_marble", "wall_beige"], "욕실": ["floor_bath", "wall_bluetile"],
+	"안방": ["floor_carpet", "wall_rose"], "서재": ["floor_walnut", "wall_green"],
+	"손님방": ["floor_worn", "wall_mustard"], "2층 복도": ["floor_honey", "wall_beige"],
+	"지하 창고": ["floor_slab", "wall_brick"], "보일러실": ["floor_concrete", "wall_soot"],
+}
+## 불빛: 그림 이름 -> [색, 반지름(칸), 세기, 깜빡임, 자리(칸, 그림 바닥 왼쪽 기준)]
+const LIGHTS := {
+	"fireplace": [Color(1.0, 0.58, 0.28), 5.5, 1.15, true, Vector2(0.5, -0.9)],
+	"floor_lamp": [Color(1.0, 0.80, 0.50), 4.0, 0.95, false, Vector2(0.5, -1.6)],
+	"nightstand": [Color(1.0, 0.78, 0.48), 3.2, 0.85, false, Vector2(0.5, -1.0)],
+	"table_lamp": [Color(1.0, 0.80, 0.50), 3.0, 0.80, false, Vector2(0.5, -0.8)],
+	"sconce": [Color(1.0, 0.78, 0.50), 3.0, 0.80, false, Vector2(0.5, -0.6)],
+	"bulb_on": [Color(1.0, 0.86, 0.60), 4.5, 1.0, false, Vector2(0.5, -0.5)],
+	"tv_on": [Color(0.55, 0.72, 1.0), 3.0, 0.75, true, Vector2(0.5, -0.9)],
+	"console": [Color(1.0, 0.30, 0.25), 1.8, 0.8, false, Vector2(0.5, -1.1)],
+	"console_open": [Color(0.35, 1.0, 0.45), 1.8, 0.8, false, Vector2(0.5, -1.1)],
+	"cctv": [Color(0.60, 0.75, 1.0), 2.6, 0.7, true, Vector2(1.0, -1.4)],
+	"boiler": [Color(1.0, 0.50, 0.20), 3.2, 0.9, true, Vector2(1.0, -0.6)],
+	"table_big": [Color(1.0, 0.86, 0.60), 3.0, 0.8, false, Vector2(0.62, -1.6)],
+	"window": [Color(0.55, 0.65, 1.0), 2.4, 0.5, false, Vector2(0.5, 0.6)],
+	"window_arch": [Color(0.55, 0.65, 1.0), 3.0, 0.55, false, Vector2(0.5, 0.6)],
+}
 ## 계단: 올라서는 칸 -> 도착 (층, 칸, 바라보는 방향)
 const STAIRS := {
 	"1F:21,12": ["B1", Vector2i(21, 5), Vector2i.DOWN],
@@ -33,10 +59,14 @@ const ROOM_NAMES := {
 var rows: Dictionary = {}          # floor -> PackedStringArray
 var size_of: Dictionary = {}       # floor -> Vector2i
 var tilemap: TileMapLayer
+var shade: TileMapLayer            # 벽 밑과 벽면 끝의 그늘
 var floor_layer: Node2D            # 깔개, 계단
 var ysort: Node2D                  # 가구, 인물
 var fog: Sprite2D
 var tint: CanvasModulate
+var overlay: CanvasLayer           # 어둠에 가리지 않는 말풍선 (세상과 함께 움직인다)
+var _flicker: Array = []           # [빛, 기본 세기, 위상]
+var _light_tex: GradientTexture2D
 var objects: Dictionary = {}       # id -> Prop
 var _at: Dictionary = {}           # Vector2i(world) -> Array[Prop]
 var room_id: Dictionary = {}       # Vector2i(world) -> int
@@ -78,6 +108,9 @@ func _ready() -> void:
 	tilemap = TileMapLayer.new()
 	tilemap.tile_set = _make_tileset()
 	add_child(tilemap)
+	shade = TileMapLayer.new()
+	shade.tile_set = tilemap.tile_set
+	add_child(shade)
 	floor_layer = Node2D.new()
 	add_child(floor_layer)
 	ysort = Node2D.new()
@@ -87,12 +120,25 @@ func _ready() -> void:
 	fog.centered = false
 	fog.scale = Vector2(T, T)
 	fog.z_index = 50
+	fog.light_mask = 0
 	add_child(fog)
+	overlay = CanvasLayer.new()
+	overlay.layer = 2
+	overlay.follow_viewport_enabled = true
+	add_child(overlay)
 	_load_map()
+	_find_rooms()
 	_paint_tiles()
 	_load_objects()
-	_find_rooms()
 	_build_nav()
+
+
+func _process(_delta: float) -> void:
+	var t := Time.get_ticks_msec() / 1000.0
+	for f in _flicker:
+		var l: PointLight2D = f[0]
+		if is_instance_valid(l):
+			l.energy = f[1] * (0.86 + 0.14 * sin(t * 7.3 + f[2]) * sin(t * 3.1 + f[2] * 2.0))
 
 
 # ---------------------------------------------------------------- 불러오기 ----
@@ -141,26 +187,47 @@ func ch(f: String, lx: int, ly: int) -> String:
 	return arr[ly][lx]
 
 
+## 칸이 속한 방의 무늬 [바닥, 벽지]. 문칸은 붙은 방(뒷마당이 아닌 쪽)을 따른다.
+func _style_at(c: Vector2i) -> Array:
+	var r := room_at(c)
+	if r == -1:
+		r = -2
+		for rr in rooms_touching(c):
+			r = rr
+			if name_of_room(rr) != "뒷마당":
+				break
+	return ROOM_STYLE.get(name_of_room(r), [])
+
+
 func _floor_tile(f: String, x: int, y: int) -> String:
 	var c := ch(f, x, y)
-	if FLOOR_TILE.has(c):
-		if c == "g" and (x * 7 + y * 13) % 5 == 0:
-			return "grass2"
-		return FLOOR_TILE[c]
-	if c == "D":
-		var counts := {}
-		for d in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 2), Vector2i(0, -2), Vector2i(0, 3), Vector2i(0, -3)]:
-			var n := ch(f, x + d.x, y + d.y)
-			if FLOOR_TILE.has(n):
-				counts[n] = counts.get(n, 0) + 1
-		var best := "."
-		var bn := -1
-		for k in counts:
-			if counts[k] > bn:
-				best = k
-				bn = counts[k]
-		return FLOOR_TILE[best]
-	return ""
+	if not WALKABLE.contains(c) or c == " ":
+		return ""
+	var style := "floor_honey"
+	if c == "g":
+		style = "grass"
+	elif c == "p":
+		style = "dirt"
+	else:
+		var st := _style_at(FLOOR_ORIGIN[f] + Vector2i(x, y))
+		if st.size() > 0:
+			style = st[0]
+	return "%s_%d" % [style, posmod(x, 4) + posmod(y, 4) * 4]
+
+
+## 벽면은 그 아래 방의 벽지를 쓴다.
+func _face_tile(f: String, x: int, y: int) -> String:
+	var style := "wall_brick" if f == "B1" else "wall_beige"
+	for dy in range(1, 4):
+		var c := ch(f, x, y + dy)
+		if c == "F":
+			continue
+		var st := _style_at(FLOOR_ORIGIN[f] + Vector2i(x, y + dy))
+		if st.size() > 1:
+			style = st[1]
+		break
+	var lower := ch(f, x, y - 1) == "F"
+	return "%s_%d" % [style, posmod(x, 8) + (8 if lower else 0)]
 
 
 func _paint_tiles() -> void:
@@ -176,12 +243,32 @@ func _paint_tiles() -> void:
 					if c == "#":
 						name = Art.wall_tile(set_name, _wall_mask(f, x, y))
 					elif c == "F":
-						var lower := ch(f, x, y - 1) == "F"
-						var le := ch(f, x - 1, y) != "F"
-						var re := ch(f, x + 1, y) != "F"
-						name = "face_%s_%s%s%s" % [set_name, "lo" if lower else "up", "_l" if le else "", "_r" if re else ""]
+						name = _face_tile(f, x, y)
 				if name != "":
 					tilemap.set_cell(o + Vector2i(x, y), 0, Art.tile_coord(name))
+				_paint_shade(f, o, x, y, c)
+
+
+## 벽면 바로 밑과 옆벽 쪽 바닥에 그늘을, 벽면 양 끝에 어두운 모서리를 깐다.
+func _paint_shade(f: String, o: Vector2i, x: int, y: int, c: String) -> void:
+	var bits := 0
+	var name := ""
+	if c == "F":
+		if ch(f, x - 1, y) != "F":
+			bits |= 1
+		if ch(f, x + 1, y) != "F":
+			bits |= 2
+		name = "fshade_%d" % bits
+	elif WALKABLE.contains(c) and c != " " and c != "g" and c != "p":
+		if "F#".contains(ch(f, x, y - 1)):
+			bits |= 1
+		if "F#".contains(ch(f, x - 1, y)):
+			bits |= 2
+		if "F#".contains(ch(f, x + 1, y)):
+			bits |= 4
+		name = "shade_%d" % bits
+	if bits > 0:
+		shade.set_cell(o + Vector2i(x, y), 0, Art.tile_coord(name))
 
 
 func _wall_mask(f: String, x: int, y: int) -> int:
@@ -239,8 +326,58 @@ func set_sprite(p: Prop, sprite_name: String) -> void:
 			sort_y = bottom - 1
 		"top":
 			sort_y = bottom + 1
-	p.position = Vector2(p.cell.x * T, sort_y)
+	# 칸보다 좁거나 넓은 그림은 발자리 가운데에 맞춘다
+	var dx := (p.w * T - tex.get_width()) / 2.0
+	p.position = Vector2(p.cell.x * T + floorf(dx), sort_y)
 	p.offset = Vector2(0, bottom - sort_y - tex.get_height())
+	_set_light(p)
+	# 창문에 셔터가 내려오면 달빛이 끊긴다
+	if sprite_name.begins_with("shutter_window"):
+		for q in objects_at(p.cell):
+			if q != p and q.kind == "window":
+				_remove_light(q)
+
+
+func _set_light(p: Prop) -> void:
+	_remove_light(p)
+	if not LIGHTS.has(p.sprite_name):
+		return
+	var d: Array = LIGHTS[p.sprite_name]
+	var l := PointLight2D.new()
+	l.name = "Light"
+	l.texture = _light_texture()
+	l.texture_scale = d[1] * T * 2.0 / 128.0
+	l.color = d[0]
+	l.energy = d[2]
+	# 그림 바닥 왼쪽(p.position 기준) -> 칸 단위 자리
+	var bottom_y := (p.cell.y + p.h) * T - p.position.y
+	l.position = Vector2(d[4].x * p.w * T - (p.position.x - p.cell.x * T), bottom_y + d[4].y * T)
+	p.add_child(l)
+	if d[3]:
+		_flicker.append([l, d[2], randf() * TAU])
+
+
+func _remove_light(p: Prop) -> void:
+	var old := p.get_node_or_null("Light")
+	if old:
+		p.remove_child(old)
+		old.queue_free()
+
+
+func _light_texture() -> Texture2D:
+	if _light_tex == null:
+		var g := Gradient.new()
+		g.set_color(0, Color(1, 1, 1, 1))
+		g.set_color(1, Color(1, 1, 1, 0))
+		g.add_point(0.45, Color(1, 1, 1, 0.5))
+		_light_tex = GradientTexture2D.new()
+		_light_tex.gradient = g
+		_light_tex.fill = GradientTexture2D.FILL_RADIAL
+		_light_tex.fill_from = Vector2(0.5, 0.5)
+		_light_tex.fill_to = Vector2(1.0, 0.5)
+		_light_tex.width = 128
+		_light_tex.height = 128
+	return _light_tex
 
 
 func obj(id: String) -> Prop:

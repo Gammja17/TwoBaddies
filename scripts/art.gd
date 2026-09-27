@@ -15,8 +15,8 @@ func _ready() -> void:
 	meta = JSON.parse_string(f.get_as_text())
 	for k in ["tiles", "props", "items", "chars", "portraits"]:
 		sheets[k] = load("res://assets/art/%s.png" % k)
-	font_main = _pixel_font("res://assets/fonts/Galmuri11.ttf")
-	font_small = _pixel_font("res://assets/fonts/Galmuri9.ttf")
+	font_main = _pixel_font("res://assets/fonts/Galmuri14.ttf")    # 15px 에서 또렷하다
+	font_small = _pixel_font("res://assets/fonts/Galmuri11.ttf")   # 12px 에서 또렷하다
 
 
 func _pixel_font(path: String) -> FontFile:
@@ -85,10 +85,15 @@ func char_frames(who: String) -> SpriteFrames:
 	return sf
 
 
-## 타일 이름 -> 아틀라스 칸 좌표 (16px 단위)
+## 타일 이름 -> 아틀라스 칸 좌표 (칸 크기 단위)
 func tile_coord(name: String) -> Vector2i:
 	var r: Array = meta["tiles"][name]
-	return Vector2i(int(r[0]) / 16, int(r[1]) / 16)
+	var s: int = meta["tiles"]["_size"]
+	return Vector2i(int(r[0]) / s, int(r[1]) / s)
+
+
+func has_tile(name: String) -> bool:
+	return meta["tiles"].has(name)
 
 
 func wall_tile(set_name: String, mask: int) -> String:
