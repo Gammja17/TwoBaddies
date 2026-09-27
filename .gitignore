@@ -1,0 +1,9 @@
+# Godot
+.godot/
+*.tmp
+
+# 원본 에셋 묶음 (tools/build_art.py 가 여기서 필요한 조각만 뽑아 assets/ 에 넣는다)
+_packs/
+
+# 내보낸 빌드
+builds/
