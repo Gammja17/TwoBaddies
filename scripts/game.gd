@@ -7,7 +7,7 @@ signal toast(text: String)
 const SAVE_PATH := "user://save.cfg"
 const ALARM_MIN := 2 * 60 + 10      # 02:10 경보
 const POLICE_SECONDS := 20 * 60     # 02:30 경찰 도착
-const TIME_SCALE := 1.5             # 게임 속 20분이 실제로는 약 13분
+const TIME_SCALE := 2.0             # 게임 속 20분이 실제로는 약 10분
 const FRIEND_LINE := 60             # 이 이상이면 '친밀'
 const BETRAY_LINE := 30             # 이 밑이면 그가 배신할 수 있다
 

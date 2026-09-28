@@ -197,8 +197,34 @@ func interact() -> void:
 		run(content.interact.bind(best))
 
 
-func bumped(_c: Vector2i) -> void:
-	pass
+var _push_t := 0.0
+var _push_frame := -10
+var _push_cool := 0.0
+
+
+## 곽두철 쪽으로 방향키를 꾹 누르고 있으면 투덜대며 자리를 바꿔 비켜 준다 (쫓아올 때는 안 비킨다).
+func bumped(c: Vector2i) -> void:
+	if not crook.active or crook.cell != c or crook.moving or not crook.greeted:
+		return
+	if crook.mode not in ["follow", "wait", "errand", "agenda"]:
+		return
+	# 같은 칸을 이어서 누르고 있는 시간
+	var f := Engine.get_physics_frames()
+	_push_t = _push_t + get_physics_process_delta_time() if f - _push_frame <= 1 else 0.0
+	_push_frame = f
+	if _push_t < 0.35:
+		return
+	_push_t = 0.0
+	var from := player.cell
+	crook.swap_with(from)
+	player.try_step(c - from)
+	var now := Time.get_ticks_msec() / 1000.0
+	if now > _push_cool:
+		_push_cool = now + 15.0
+		Game.add_affinity(-2, "밀침")
+		crook.bark("아이씨, 왜 밀어! (호감 ▼)", 1.8)
+	else:
+		crook.bark("아이씨, 왜 밀어!", 1.5)
 
 
 func player_stepped(c: Vector2i, running: bool) -> void:

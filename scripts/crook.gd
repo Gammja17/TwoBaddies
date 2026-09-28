@@ -94,6 +94,20 @@ func _physics_process(delta: float) -> void:
 	_update_visibility()
 
 
+## 쓰러져 있으면 길을 막지 않는다 (넘어갈 수 있다).
+func visible_in_world() -> bool:
+	return super() and not is_down()
+
+
+## 도둑이 밀고 지나갈 때 도둑 자리로 비킨다. 가던 길은 새로 찾는다.
+func swap_with(c: Vector2i) -> void:
+	_path = []
+	_repath = 0.0
+	_stuck = 0.0
+	step_time = 0.18
+	walk_to(c)
+
+
 func _update_visibility() -> void:
 	visible = hidden_in == "" and active and mode != "gone" and world.cell_lit(cell)
 

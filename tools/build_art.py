@@ -291,7 +291,7 @@ PROPS_KENNEY = {
 }
 # VARCO 로만 있는 것 (옛 그림이 없다)
 PROPS_NEW = ["floor_lamp", "sconce", "table_lamp", "coat_stand", "shoe_rack", "umbrella_stand", "tv_off",
-             "on_notepad"]
+             "on_notepad", "stool"]
 # 같은 그림을 쓰는 것
 PROP_ALIAS = {"hedge_l": "hedge", "hedge_r": "hedge"}
 
@@ -352,7 +352,7 @@ def build_props():
 
 ITEMS = ["lockpick", "flashlight", "tape", "compact", "ash", "fingerprint", "knife", "pan", "rope", "gloves",
          "oil", "pills", "sandwich", "whiskey", "crowbar", "jack", "bulb", "diary", "memo", "photo",
-         "card", "manual", "newspaper", "necklace", "gold", "cash", "silver_candle", "watch", "notebook"]
+         "card", "manual", "newspaper", "necklace", "gold", "cash", "silver_candle", "watch", "notebook", "stool"]
 ICON = 24
 
 

@@ -39,6 +39,8 @@ const DB := {
 		"desc": "수면제를 녹인 위스키. 맛이 조금 쓸지도 모른다."},
 	"crowbar": {"name": "쇠지렛대", "icon": "crowbar", "kind": "weapon",
 		"desc": "지하 창고의 빠루. 문짝 하나쯤은 뜯어낸다. 휘두르면 무기도 된다."},
+	"stool": {"name": "발판", "icon": "stool", "kind": "tool",
+		"desc": "식료품 창고 선반 사이에 있던 나무 발판. 밟고 서면 높은 데 손이 닿는다."},
 	"jack": {"name": "자동차 잭", "icon": "jack", "kind": "tool",
 		"desc": "차 바퀴 갈 때 쓰는 잭. 무거운 것을 혼자서도 들어 올릴 수 있다."},
 	"bulb": {"name": "전구", "icon": "bulb", "kind": "tool",

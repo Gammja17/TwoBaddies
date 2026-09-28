@@ -46,6 +46,7 @@
 {"id":"util_boxes","f":"1F","x":15,"y":19,"s":"boxes","k":"boxes"},
 {"id":"pantry_shelf1","f":"1F","x":10,"y":3,"s":"shelf_tall","k":"pantry_shelf"},
 {"id":"pantry_shelf2","f":"1F","x":12,"y":3,"s":"shelf_tall","k":"pantry_shelf"},
+{"id":"stool","f":"1F","x":11,"y":3,"s":"stool"},
 {"id":"pantry_boxes1","f":"1F","x":10,"y":8,"s":"boxes","k":"boxes"},
 {"id":"pantry_boxes2","f":"1F","x":12,"y":8,"s":"boxes","k":"boxes"},
 {"id":"pantry_door","f":"1F","x":13,"y":7,"s":"door_side_open","solid":false},

@@ -270,7 +270,7 @@ def cut_walls(sid):
 
 def cut_title():
     # 두 장 가운데 왼쪽 하늘이 넓어 제목 자리가 나는 두 번째 것
-    img = load("TITLE_1")
+    img = load("TITLE_1_clean")   # 창문 속 실루엣을 지운 것 (숨어 있는 사람을 첫 화면에서 드러내지 않게)
     t = img.resize((640, 360), Image.LANCZOS).convert("RGBA")
     save(reduce_colors(t, 64), "title_bg.png")
     print("TITLE: 첫 화면")

@@ -117,7 +117,7 @@ func show_title() -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 8)
 	col.add_child(gap)
-	col.add_child(UI.outline(UI.label("잠긴 별장에 좀도둑과 수배범.", UI.SMALL, Color(0.86, 0.84, 0.8), true)))
+	col.add_child(UI.outline(UI.label("잠긴 별장에 갇힌 좀도둑.", UI.SMALL, Color(0.86, 0.84, 0.8), true)))
 	col.add_child(UI.outline(UI.label("경찰이 오기까지 20분.", UI.SMALL, Color(0.86, 0.84, 0.8), true)))
 	var opts := ["새로 시작", "엔딩 모음 (%d / %d)" % [Game.endings.size(), Endings.ORDER.size()], "소리 설정"]
 	var m := UI.Menu.new()

@@ -398,6 +398,13 @@ func lock_crook_in() -> void:
 	await me("미안해요. 경찰 오면 꺼내 줄 거예요.", "nervous")
 
 
+func o_stool(_p) -> void:
+	await narr("선반 사이에 높은 칸 물건을 꺼낼 때 쓰는 나무 발판이 있다.")
+	take_prop("stool")
+	got("stool")
+	await me("발판이네. 손이 안 닿는 데가 있으면 쓰자.")
+
+
 func o_pans(_p) -> void:
 	if Game.has("pan") or Game.flag("pan_taken"):
 		await narr("냄비만 남아 있다.")
@@ -1142,9 +1149,13 @@ func o_chute(p) -> void:
 		"together":
 			await _lift_together(p)
 		"jack":
-			var ok: bool = await play.work(10.0, "잭으로 쇠창살을 받치는 중")
-			if not ok:
-				return
+			# 한참 걸리고, 쇳소리가 나서 가까이 있으면 곽두철이 듣는다
+			for k in 3:
+				play.noise_at(play.player.cell, 14.0)
+				Sfx.play("metal")
+				var ok: bool = await play.work(5.0, "잭으로 쇠창살을 받치는 중 %d/3" % (k + 1))
+				if not ok:
+					return
 			Game.take("jack")
 			_open_chute(p)
 			await narr("잭이 끼익 소리를 내며 쇠창살을 밀어 올렸다. 사람 하나 빠져나갈 틈이 생겼다.")
@@ -1200,6 +1211,11 @@ func _crook_betrays(p) -> void:
 
 
 func _climb_chute() -> void:
+	# 구멍이 높다. 덩치 큰 곽두철은 그냥 올라가지만 만복은 밟고 설 게 있거나 받쳐 줄 사람이 있어야 한다.
+	if not Game.has("stool") and not (Game.coop and crook_near(3.0)):
+		await narr("구멍이 벽 높이 붙어 있어서 손이 닿지 않는다.")
+		await me("밟고 올라설 게 있어야겠어.")
+		return
 	var i := await pick(["구멍으로 빠져나간다", "아직 안 나간다"])
 	if i != 0:
 		return
@@ -1482,7 +1498,7 @@ func _talk_partner() -> void:
 
 func _talk_how() -> void:
 	await him("현관은 비밀번호 여섯 자리 아니면 집주인 지문이다. 번호는 모르겠고, 지문은 영감이 있어야지.")
-	if Game.affinity >= 45 and not Game.flag("chute_told"):
+	if Game.affinity >= 60 and not Game.flag("chute_told"):
 		Game.setf("chute_told")
 		Game.setf("chute_known")
 		await him("...사실 하나 더 있다. 내가 들어온 길.", "soft")

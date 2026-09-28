@@ -15,7 +15,7 @@ func _ready() -> void:
 	scen = args[0] if args.size() > 0 else "all"
 	Game.test_mode = true
 	Engine.time_scale = 4.0
-	var list := ["endings", "agenda", "coop", "code", "print", "trap", "hostile", "betray", "hide"] if scen == "all" else [scen]
+	var list := ["endings", "agenda", "coop", "code", "print", "trap", "hostile", "betray", "hide", "jack", "push"] if scen == "all" else [scen]
 	for s in list:
 		print("\n==== ", s, " ====")
 		await call("s_" + s)
@@ -188,7 +188,8 @@ func s_coop() -> void:
 	check(Game.coop and Game.met, "처음 만나 같이 가기로 함")
 	check(Game.affinity == 50, "솔직하게 말해 호감 50 (%d)" % Game.affinity)
 	check(c.mode == "follow", "따라온다 (%s)" % c.mode)
-	# 어떻게 나갈지 물으면 석탄 구멍을 알려 준다
+	# 꽤 믿는 사이(호감 60)가 되면, 어떻게 나갈지 물을 때 석탄 구멍을 알려 준다
+	Game.affinity = 60
 	Game.test_choices = [0]
 	play.teleport_player(c.cell + Vector2i.DOWN, Vector2i.UP)
 	await wait(0.2)
@@ -209,7 +210,7 @@ func s_coop() -> void:
 	dump_log(8)
 	var id: String = await ending()
 	check(Game.escaped and Game.escaped_with_crook, "둘이 석탄 구멍으로 빠져나감")
-	check(id == "tale", "엔딩: %s (호감 %d, 기대 tale)" % [id, Game.affinity])
+	check(id == "friend", "엔딩: %s (호감 %d, 기대 friend)" % [id, Game.affinity])
 
 
 func s_code() -> void:
@@ -346,6 +347,50 @@ func s_hide() -> void:
 	await wait(0.2)
 	await idle()
 	check(play.player.hidden_in == "" and play.player.cell != c.cell, "곽두철과 겹치지 않는 칸으로 나옴")
+
+
+## 혼자 잭으로 석탄 구멍을 연다: 구멍이 높아서 발판 없이는 못 올라가고, 발판을 주워 오면 나간다
+func s_jack() -> void:
+	await start_game()
+	play.crook.active = false
+	Game.give("jack")
+	await use("B1", 11, 3, Vector2i.UP, [0])
+	check(Game.flag("chute_open") and not Game.escaped, "잭으로 쇠창살을 열었지만 발판이 없어 못 올라감")
+	await use_obj("stool")
+	check(Game.has("stool"), "식료품 창고에서 발판을 주움")
+	await use("B1", 11, 3, Vector2i.UP, [0])
+	var id: String = await ending()
+	check(Game.escaped and id == "tale", "발판을 딛고 석탄 구멍으로 나감 (엔딩 %s)" % id)
+
+
+## 곽두철 쪽으로 방향키를 꾹 누르면 투덜대며 자리를 바꿔 비켜 준다
+func s_push() -> void:
+	await start_game()
+	var c: Actor = play.crook
+	Game.met = true
+	Game.coop = true
+	Game.coop_ever = true
+	c.greeted = true
+	c.active = true
+	c.stay()
+	play.teleport_player(cell("1F", 26, 15), Vector2i.RIGHT)
+	c.place(cell("1F", 27, 15), Vector2i.LEFT)
+	var a0 := Game.affinity
+	for pressed in [true, false]:
+		var ev := InputEventAction.new()
+		ev.action = "right"
+		ev.pressed = pressed
+		Input.parse_input_event(ev)
+		await wait(0.6)
+	await wait(0.4)
+	check(c.cell == cell("1F", 26, 15) and play.player.cell.x >= cell("1F", 27, 15).x, "곽두철을 밀고 지나감 (곽두철 %s, 도둑 %s)" % [str(c.cell), str(play.player.cell)])
+	check(Game.affinity == a0 - 2, "호감이 조금 내려감 (%d -> %d)" % [a0, Game.affinity])
+	# 쓰러져 있으면 그냥 넘어간다
+	c.knock_down("stunned", 999.0)
+	play.teleport_player(cell("1F", 25, 15), Vector2i.RIGHT)
+	play.player.try_step(Vector2i.RIGHT)
+	await wait(0.4)
+	check(play.player.cell == c.cell, "쓰러진 곽두철은 넘어갈 수 있음")
 
 
 ## 모든 물건을 차례로 조사한다 (선택지는 무작위). 실행 오류가 나면 Godot 이 SCRIPT ERROR 를 찍는다.

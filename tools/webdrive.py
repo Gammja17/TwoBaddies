@@ -48,7 +48,7 @@ KEYS = {
     "ArrowUp": ("ArrowUp", "ArrowUp", 38), "ArrowDown": ("ArrowDown", "ArrowDown", 40),
     "ArrowLeft": ("ArrowLeft", "ArrowLeft", 37), "ArrowRight": ("ArrowRight", "ArrowRight", 39),
     "Enter": ("Enter", "Enter", 13), "Escape": ("Escape", "Escape", 27), "Shift": ("Shift", "ShiftLeft", 16),
-    "Tab": ("Tab", "Tab", 9), "Space": (" ", "Space", 32),
+    "Tab": ("Tab", "Tab", 9), "Space": (" ", "Space", 32), "Period": (".", "Period", 190),
 }
 
 
