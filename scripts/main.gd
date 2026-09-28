@@ -112,7 +112,7 @@ func show_title() -> void:
 	col.position = Vector2(35, 104)
 	col.add_theme_constant_override("separation", 3)
 	s.add_child(col)
-	col.add_child(UI.outline(UI.label("2 BADDIES", UI.BIG, UI.GOLD), 5))
+	col.add_child(UI.outline(UI.label("TWO BADDIES", UI.BIG, UI.GOLD), 5))
 	col.add_child(UI.outline(UI.label("두 악당", UI.BODY, UI.TEXT)))
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 8)

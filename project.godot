@@ -4,7 +4,7 @@ config_version=5
 
 [application]
 
-config/name="2 Baddies"
+config/name="TWO BADDIES"
 config/description="잠긴 대저택에서 좀도둑과 수배범이 경찰보다 먼저 빠져나가야 하는 이야기"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7")
