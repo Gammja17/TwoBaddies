@@ -1,5 +1,7 @@
 extends Control
-## 시계, 방 이름, 알림, 조작 안내, 작업 막대, 화면 전환.
+## 시계, 방 이름, 알림, 조작 안내, 작업 막대, 메모장 단추, 화면 전환.
+
+signal memo_pressed
 
 var clock_panel: Panel
 var clock_label: Label
@@ -15,6 +17,7 @@ var work_fill: ColorRect
 var fade: ColorRect
 var flash: ColorRect
 var hide_label: Label
+var memo_btn: Control
 var _room_tw: Tween
 
 
@@ -101,6 +104,8 @@ func _ready() -> void:
 	work_panel.add_child(work_fill)
 	work_panel.visible = false
 
+	_make_memo_button()
+
 	flash = ColorRect.new()
 	flash.set_anchors_preset(Control.PRESET_FULL_RECT)
 	flash.color = Color(0.9, 0.1, 0.08, 0.0)
@@ -113,7 +118,39 @@ func _ready() -> void:
 	add_child(fade)
 
 
+## 왼쪽 아래 종이와 펜 단추 (메모장을 주웠을 때만). 휴대폰은 방향 패드 바로 위.
+func _make_memo_button() -> void:
+	var touch := DisplayServer.is_touchscreen_available()
+	memo_btn = Control.new()
+	memo_btn.anchor_top = 1.0
+	memo_btn.anchor_bottom = 1.0
+	memo_btn.offset_left = 45.0 if touch else 12.0
+	memo_btn.offset_top = -196.0 if touch else -64.0
+	memo_btn.offset_right = memo_btn.offset_left + 48
+	memo_btn.offset_bottom = memo_btn.offset_top + 48
+	memo_btn.mouse_filter = Control.MOUSE_FILTER_STOP
+	memo_btn.gui_input.connect(func(ev: InputEvent):
+		if (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT) or (ev is InputEventScreenTouch and ev.pressed):
+			memo_pressed.emit())
+	var bg := TextureRect.new()
+	bg.texture = UI.circle_tex(24, Color(0.1, 0.09, 0.12, 0.55), Color(0.9, 0.85, 0.75, 0.55))
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	memo_btn.add_child(bg)
+	var icon := TextureRect.new()
+	icon.texture = Art.item("notebook")
+	icon.position = Vector2(12, 11)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	memo_btn.add_child(icon)
+	if not touch:
+		var key := UI.outline(UI.label("M", UI.SMALL, UI.TEXT, true))
+		key.position = Vector2(38, 32)
+		memo_btn.add_child(key)
+	memo_btn.visible = false
+	add_child(memo_btn)
+
+
 func _process(_delta: float) -> void:
+	memo_btn.visible = Game.has("notepad") and Game.busy == 0 and Game.phase in ["play", "prologue"]
 	if clock_panel.visible:
 		clock_label.text = Game.clock_text()
 		var m := Game.minutes_left()

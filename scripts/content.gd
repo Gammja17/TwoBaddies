@@ -5,22 +5,6 @@ extends RefCounted
 const CODE_FRONT := "760515"   # 결혼한 날 1976년 5월 15일 (여섯 자리)
 const CODE_SAFE := "0823"      # 손자 지훈이 생일 8월 23일
 
-## 수첩에 적히는 단서 [제목, 내용]
-const NOTES := {
-	"clock": ["현관 괘종시계", "5시 15분에 멈춰 있다. 건전지를 일부러 뺐다."],
-	"calendar": ["냉장고 달력", "5월 15일 칸에 빨간 하트."],
-	"wedding": ["결혼사진 뒷면", "'은혼식 날 다시 꺼내 봤다. 2001년 5월' 은혼식은 결혼 25주년."],
-	"watch": ["금 회중시계", "뚜껑 안쪽에 '1974. 10. 3. 처음 만난 날. 순애가'"],
-	"memo": ["할머니 메모", "현관 번호는 결혼한 날, 여섯 자리. 달이랑 날은 현관 시계가, 해는 결혼사진이 알려 준다."],
-	"diary_code": ["할아버지 일기", "현관 번호는 두 분이 부부가 된 날, 여섯 자리. 그날에 맞춰 괘종시계를 멈춰 뒀다."],
-	"diary_safe": ["할아버지 일기", "금고 번호는 지훈이 생일."],
-	"card": ["지훈이 생일 카드", "8월 23일, 생일 아침에 자전거를 받았다."],
-	"manual": ["보안 설명서", "현관은 비밀번호 여섯 자리나 집주인 지문으로 열린다. 세 번 틀리면 1분 잠긴다."],
-	"glass": ["식당 위스키 잔", "할아버지 손자국이 선명하다."],
-	"glasses": ["서재 돋보기안경", "알에 할아버지 지문이 잔뜩 묻어 있다."],
-	"chute": ["보일러실 석탄 구멍", "밖으로 이어진다. 쇠창살이 무거워서 혼자서는 못 든다."],
-}
-
 var play: Node
 var hide_seen := false          # 숨는 모습을 곽두철이 봤는지
 var _prologue_step := 0
@@ -60,21 +44,6 @@ func got(item: String) -> void:
 	Game.give(item)
 	Sfx.play("pick")
 	play.toast("%s 챙김" % Items.name_of(item), UI.GOLD)
-
-
-## 눈여겨본 것을 수첩에 적는다
-func note(id: String) -> void:
-	if Game.notes.has(id):
-		return
-	Game.notes.append(id)
-	play.toast("수첩에 적었다" if Game.notes.size() > 1 else "수첩에 적었다. 주머니에서 펼쳐 볼 수 있다.", UI.DIM)
-
-
-func note_lines() -> Array:
-	var out := []
-	for id in Game.notes:
-		out.append(NOTES[id])
-	return out
 
 
 func crook_near(dist := 3.0) -> bool:
@@ -300,6 +269,20 @@ func k_washer(_p) -> void:
 	await narr("세탁기다. 할머니 스웨터 한 벌이 돌다 만 채 들어 있다.")
 
 
+func o_notepad(_p) -> void:
+	await narr("세탁기 위에 할머니가 장 볼 거리를 적던 메모장과 볼펜이 있다.")
+	take_prop("notepad")
+	got("notepad")
+	await me("메모장이랑 볼펜이네. 번호 같은 건 적어 두자.")
+	# 잠깐 알려 주고, 원래 떠 있던 안내(프롤로그)로 돌려 놓는다
+	var tip := "왼쪽 아래 메모장을 누르거나 M 키로 적어 봐요."
+	var before: String = play.hud.hint_label.text if play.hud.hint_panel.visible else ""
+	play.hud.hint(tip)
+	play.get_tree().create_timer(6.0).timeout.connect(func():
+		if is_instance_valid(play) and play.hud.hint_panel.visible and play.hud.hint_label.text == tip:
+			play.hud.hint(before))
+
+
 func k_clothesline(_p) -> void:
 	await narr("빨래가 널려 있다. 떠나기 전날 빨았나 보다.")
 
@@ -431,7 +414,6 @@ func o_pans(_p) -> void:
 func o_fridge(_p) -> void:
 	await narr("냉장고 문에 달력이 붙어 있다. 5월 15일 칸에 빨간 하트가 그려져 있다.")
 	Game.setf("clue_calendar")
-	note("calendar")
 	if not Game.flag("sandwich_taken"):
 		await narr("안에는 랩을 씌운 샌드위치가 하나 있다. '영감 야식'이라고 적힌 쪽지가 붙어 있다.")
 		var i := await pick(["샌드위치를 챙긴다", "그냥 닫는다"])
@@ -515,7 +497,6 @@ func o_glass(_p) -> void:
 	await narr("할아버지 자리에 위스키 잔이 놓여 있다. 떠나기 전에 한잔하셨나 보다.")
 	await narr("유리에 기름진 손자국이 선명하다.")
 	Game.setf("saw_glass")
-	note("glass")
 	await _try_fingerprint("위스키 잔")
 
 
@@ -596,7 +577,6 @@ func o_clock(_p) -> void:
 	await narr("벽에 걸린 괘종시계가 멈춰 있다. 5시 15분.")
 	await narr("건전지를 뺀 흔적이 있다. 일부러 멈춰 둔 것 같다.")
 	Game.setf("clue_clock")
-	note("clock")
 	if Game.flag("read_diary") or Game.flag("read_memo"):
 		await me("5시 15분... 5월 15일. 결혼한 날이다!", "shock")
 
@@ -811,7 +791,6 @@ func o_photo_wedding(_p) -> void:
 		await narr("뒷면에 펜으로 적혀 있다. '은혼식 날 다시 꺼내 봤다. 2001년 5월'")
 		await me("은혼식이면 결혼 25주년이지.")
 		Game.setf("clue_year")
-		note("wedding")
 
 
 func o_piano(_p) -> void:
@@ -908,7 +887,6 @@ func o_nightstand(_p) -> void:
 	await narr("할아버지 쪽 협탁이다. 서랍 속에 금 회중시계가 들어 있다.")
 	await narr("뚜껑 안쪽에 글씨가 새겨져 있다. '1974. 10. 3. 처음 만난 날. 순애가'")
 	Game.setf("clue_watch")
-	note("watch")
 	var took := await _steal_prompt("watch", "")
 	if took:
 		await me("처음 만난 날까지 새겨 뒀네... 좀 미안하다.", "nervous")
@@ -997,7 +975,6 @@ func o_tape(_p) -> void:
 
 func o_reading_glasses(_p) -> void:
 	await narr("할아버지 돋보기안경이다. 알에 지문이 잔뜩 묻어 있다.")
-	note("glasses")
 	await _try_fingerprint("돋보기안경")
 
 
@@ -1144,7 +1121,6 @@ func o_chute(p) -> void:
 		Game.setf("chute_known")
 		await me("밖으로 이어진 구멍이다! 방범 장치에는 안 걸려 있을 거야.", "shock")
 	await narr("쇠창살을 들어 보았다. 꿈쩍도 하지 않는다. 혼자서는 무리다.")
-	note("chute")
 	var opts := []
 	var acts := []
 	if Game.coop and crook_near(3.0):
@@ -1241,8 +1217,6 @@ func read_doc(id: String) -> void:
 			await narr("(일기) 할멈이 이번엔 절대 안 잊을 번호로 바꿨단다. 우리가 부부가 된 날, 여섯 자리.")
 			await narr("(일기) 그래도 잊을까 봐 현관 괘종시계를 그날에 맞춰 멈춰 뒀다고 한다. 시계가 멈추니 집이 조용하다.")
 			await narr("(일기) 금고 번호는 지훈이 생일로 해 뒀다. 이건 할멈한테도 비밀이다.")
-			note("diary_code")
-			note("diary_safe")
 			if Game.flag("clue_clock"):
 				await me("괘종시계가 5시 15분에 멈춰 있었어. 그럼 5월 15일?", "shock")
 			if Game.flag("read_card"):
@@ -1251,11 +1225,9 @@ func read_doc(id: String) -> void:
 			Game.setf("read_memo")
 			await narr("(메모) 영감, 현관 번호 또 잊었지요? 우리 결혼한 날, 여섯 자리예요.")
 			await narr("(메모) 달이랑 날은 현관 시계가, 해는 결혼사진이 알려 줄 거예요. 셈은 영감이 좀 해요.")
-			note("memo")
 		"card":
 			Game.setf("read_card")
 			await narr("(카드) 할아버지 할머니, 자전거 고마워요! 8월 23일 생일 아침에 받은 선물 중에 최고예요. 지훈 올림")
-			note("card")
 			if Game.flag("read_diary"):
 				await me("금고 번호가 지훈이 생일이랬지. 그럼 0823?", "smile")
 		"manual":
@@ -1263,7 +1235,6 @@ func read_doc(id: String) -> void:
 			await narr("(설명서) 침입이 감지되면 모든 출입구와 창문이 철제 셔터로 봉쇄되고, 경찰에 자동 신고됩니다.")
 			await narr("(설명서) 봉쇄를 풀려면 현관 단말기에 등록된 비밀번호 여섯 자리를 누르거나, 집주인 지문을 대십시오.")
 			await narr("(설명서) 비밀번호를 세 번 틀리면 1분 동안 입력이 잠깁니다. 정전이 되어도 셔터는 배터리로 잠긴 채 유지됩니다.")
-			note("manual")
 		"newspaper":
 			Game.setf("read_news")
 			await narr("(신문, 5월 13일자) 강도상해 피의자 곽두철, 경찰 포위망 뚫고 도주.")
@@ -1276,9 +1247,6 @@ func use_item(item: String, action: String) -> void:
 	match action:
 		"읽는다":
 			await read_doc(Items.info(item)["read"])
-		"펼친다":
-			Sfx.play("page")
-			await play.notebook.open(note_lines())
 		"샌드위치에 탄다":
 			Game.take("pills")
 			Game.take("sandwich")
@@ -1519,7 +1487,6 @@ func _talk_how() -> void:
 		Game.setf("chute_known")
 		await him("...사실 하나 더 있다. 내가 들어온 길.", "soft")
 		await him("지하 보일러실 석탄 구멍. 쇠창살이 무거워서 혼자선 못 들어. 둘이면 된다.")
-		note("chute")
 		await me("그걸 왜 이제 말해요!", "shock")
 		await him("널 믿어도 되는지 몰랐으니까.")
 	elif Game.flag("chute_told"):

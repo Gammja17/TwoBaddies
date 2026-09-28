@@ -290,7 +290,8 @@ PROPS_KENNEY = {
     "tree_round": ("rpg", 14, 9, 1, 1), "flowers": ("rpg", 28, 9, 1, 1),
 }
 # VARCO 로만 있는 것 (옛 그림이 없다)
-PROPS_NEW = ["floor_lamp", "sconce", "table_lamp", "coat_stand", "shoe_rack", "umbrella_stand", "tv_off"]
+PROPS_NEW = ["floor_lamp", "sconce", "table_lamp", "coat_stand", "shoe_rack", "umbrella_stand", "tv_off",
+             "on_notepad"]
 # 같은 그림을 쓰는 것
 PROP_ALIAS = {"hedge_l": "hedge", "hedge_r": "hedge"}
 

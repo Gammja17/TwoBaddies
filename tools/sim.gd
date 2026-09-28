@@ -217,15 +217,18 @@ func s_code() -> void:
 	hide_player()
 	play.crook.active = false
 	play.player.set_hidden("")
-	# 단서를 보면 수첩에 적힌다
-	await use_obj("clock")
-	await use_obj("photo_wedding", [0])
-	await use_obj("nightstand", [1])
-	check(Game.notes == ["clock", "wedding", "watch"], "괘종시계, 결혼사진 뒷면, 회중시계가 차례로 수첩에 적힘 (%s)" % str(Game.notes))
-	Game.test_log = []
-	play.run(func(): await play.content.use_item("notebook", "펼친다"))
+	# 메모장은 주워야 쓸 수 있다
+	check(not Game.has("notepad"), "처음에는 메모장이 없음")
+	play.open_memo()
 	await idle()
-	check(Game.test_log.has("[수첩] 3줄"), "주머니에서 수첩을 펼침")
+	check(not Game.test_log.has("[메모장] 0자"), "줍기 전에는 메모장이 안 열림")
+	await use_obj("notepad")
+	check(Game.has("notepad") and W.obj("notepad") == null, "세탁기 위 메모장을 주움")
+	Game.memo = "760515?"
+	Game.test_log = []
+	play.open_memo()
+	await idle()
+	check(Game.test_log.has("[메모장] 7자"), "주운 메모장을 펼침")
 	Game.test_codes = ["123456", "760515"]
 	await use("1F", 30, 18, Vector2i.DOWN, [0])
 	check(not Game.flag("front_open") and Game.wrong_codes == 1, "틀린 번호는 안 열림")
@@ -241,6 +244,7 @@ func s_code() -> void:
 
 func s_print() -> void:
 	await start_game()
+	check(Game.memo == "" and not Game.has("notepad"), "새 판이면 메모장이 비어 있고 다시 주워야 함")
 	play.crook.active = false
 	# 분첩, 테이프를 챙겨 위스키 잔에서 지문을 뜬다
 	Game.give("compact")

@@ -83,6 +83,9 @@ func _physics_process(_delta: float) -> void:
 	if Input.is_action_just_pressed("menu"):
 		play.open_pocket()
 		return
+	if Input.is_action_just_pressed("memo") and Game.has("notepad"):
+		play.open_memo()
+		return
 	if moving:
 		return
 	var dir: Vector2i = _held.back() if _held.size() > 0 else Vector2i.ZERO

@@ -496,6 +496,9 @@ func _on_cmd(args: Array) -> void:
 			show_ending(parts[1], true)
 		"gallery":
 			show_gallery()
+		"memo":
+			# 메모장에 적힌 글을 window.__memo 로 꺼내 본다 (한글 입력 시험)
+			JavaScriptBridge.eval("window.__memo = %s" % JSON.stringify(Game.memo))
 
 
 func _on_shot(args: Array) -> void:

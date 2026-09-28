@@ -26,7 +26,7 @@ var inventory: Array[String] = []
 var loot: Dictionary = {}       # 훔친 것 -> 값 (만원)
 var loot_split: Dictionary = {} # 곽두철과 반씩 나눈 것
 var flags: Dictionary = {}
-var notes: Array = []           # 수첩에 적은 단서 (적은 차례대로)
+var memo := ""                  # 메모장에 적은 글 (판이 끝나면 지워진다)
 var affinity := 40
 var met := false
 var coop := false
@@ -69,11 +69,11 @@ func new_run() -> void:
 	t = 0.0
 	clock_on = false
 	busy = 0
-	inventory = ["lockpick", "notebook"]
+	inventory = ["lockpick"]
 	loot = {}
 	loot_split = {}
 	flags = {}
-	notes = []
+	memo = ""
 	affinity = 40
 	met = false
 	coop = false
@@ -256,6 +256,7 @@ func _register_inputs() -> void:
 	_add("cancel", [KEY_X, KEY_BACKSPACE])
 	_add("run", [KEY_SHIFT])
 	_add("menu", [KEY_C, KEY_TAB, KEY_I])
+	_add("memo", [KEY_M])
 	_add("pause", [KEY_ESCAPE, KEY_P])
 
 

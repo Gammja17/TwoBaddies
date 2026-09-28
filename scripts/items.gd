@@ -5,8 +5,8 @@ extends RefCounted
 const DB := {
 	"lockpick": {"name": "자물쇠 따개", "icon": "lockpick", "kind": "tool",
 		"desc": "만복의 밥줄. 서랍이나 보석함 정도의 작은 자물쇠는 이걸로 딴다."},
-	"notebook": {"name": "만복의 수첩", "icon": "notebook", "kind": "tool",
-		"desc": "일할 때 꼭 챙기는 수첩. 눈여겨본 것은 여기 적어 둔다."},
+	"notepad": {"name": "메모장과 볼펜", "icon": "notebook", "kind": "tool",
+		"desc": "세탁기 위에 있던 할머니의 장보기 메모장. 왼쪽 아래 메모장을 누르거나 M 키로 펼쳐 적는다."},
 	"flashlight": {"name": "손전등", "icon": "flashlight", "kind": "tool",
 		"desc": "다용도실 선반에서 챙겼다. 불 꺼진 지하도 이게 있으면 다닐 만하다."},
 	"tape": {"name": "투명 테이프", "icon": "tape", "kind": "tool",

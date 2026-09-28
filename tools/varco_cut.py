@@ -108,6 +108,11 @@ def place(piece, bw, bh, mode):
         small = reduce_colors(shrink(piece, w, h), 24)
         canvas.alpha_composite(small, ((bw - w) // 2, 25 - h))
         return canvas
+    if mode == "on_high":
+        # 키 큰 가구(세탁기) 윗면에 기대 놓은 것: 윗면 조금 위까지 올라오게 (상자 높이 44 기준)
+        small = reduce_colors(shrink(piece, 20, 16), 24)
+        canvas.alpha_composite(small, ((bw - 20) // 2, 0))
+        return canvas
     if mode == "span":
         s = bw / pw
         w, h = bw, min(bh, max(1, round(ph * s)))
@@ -162,6 +167,13 @@ def cut_icons(sid):
     def icon(piece, _e):
         return place(piece, M.ICON, M.ICON, "floor")
     cut_grid(sid, M.ICONS[sid], 4, 4, "icons", icon)
+    # 아이콘 시트에서 세상에 놓을 소품도 자른다
+    extra = M.ICON_PROPS.get(sid, [])
+    if extra:
+        entries = [None] * 16
+        for i, name, bw, bh, mode in extra:
+            entries[i] = (name, bw, bh, mode)
+        cut_grid(sid, entries, 4, 4, "props", lambda p, e: place(p, e[1], e[2], e[3]))
 
 
 # ---------------------------------------------------------------- 인물 ----

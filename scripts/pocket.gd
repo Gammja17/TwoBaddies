@@ -141,8 +141,6 @@ static func actions_for(id: String) -> Array:
 	if info.has("read"):
 		return ["읽는다"]
 	match id:
-		"notebook":
-			return ["펼친다"]
 		"pills":
 			var out := []
 			if Game.has("sandwich"):

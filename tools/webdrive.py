@@ -12,6 +12,10 @@ plan.json 은 명령 목록이다.
   ["cmd", "명령"]         디버그 빌드의 window.gdCmd(명령)
   ["shot", "파일.png"]    화면 찍기
   ["tap", x, y]           터치 한 번 (CSS 픽셀)
+  ["click", x, y]         마우스 누르기 한 번 (CSS 픽셀)
+  ["text", "글자"]        입력기가 확정해 넣은 글자처럼 넣기
+  ["compose", ["ㄱ", "가"]]  한글 조합을 보여 주다가 마지막 글자로 확정
+창 크기는 WD_SIZE="너비,높이" (기본 960,540), 터치 화면은 WD_TOUCH=1.
 """
 import asyncio
 import base64
@@ -135,6 +139,21 @@ async def run(plan, out_dir):
                     pts = [{"x": step[1], "y": step[2]}] if t == "touchStart" else []
                     await cdp.call("Input.dispatchTouchEvent", type=t, touchPoints=pts)
                     await asyncio.sleep(0.08)
+            elif op == "click":
+                for t in ("mousePressed", "mouseReleased"):
+                    await cdp.call("Input.dispatchMouseEvent", type=t, x=step[1], y=step[2], button="left", clickCount=1)
+                    await asyncio.sleep(0.08)
+            elif op == "text":
+                # 입력기가 글자를 확정해 넣은 것처럼 (한글 시험용)
+                await cdp.call("Input.insertText", text=step[1])
+                await asyncio.sleep(0.2)
+            elif op == "compose":
+                # 한글 조합 중인 글자를 보여 주다가 확정한다
+                for part in step[1]:
+                    await cdp.call("Input.imeSetComposition", text=part, selectionStart=len(part), selectionEnd=len(part))
+                    await asyncio.sleep(0.12)
+                await cdp.call("Input.insertText", text=step[1][-1])
+                await asyncio.sleep(0.2)
             elif op == "shot":
                 r = await cdp.call("Page.captureScreenshot", format="png")
                 path = os.path.join(out_dir, step[1])

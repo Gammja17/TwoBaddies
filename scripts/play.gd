@@ -16,7 +16,7 @@ var ui: CanvasLayer
 var hud: Control
 var dlg: Control
 var pocket: Control
-var notebook: Control
+var memo: Control
 var picker: Control
 var keypad: Control
 var touch: Node
@@ -52,8 +52,9 @@ func setup(skip_prologue: bool) -> void:
 	ui.add_child(dlg)
 	pocket = preload("res://scripts/pocket.gd").new()
 	ui.add_child(pocket)
-	notebook = preload("res://scripts/notebook.gd").new()
-	ui.add_child(notebook)
+	memo = preload("res://scripts/memo.gd").new()
+	ui.add_child(memo)
+	hud.memo_pressed.connect(open_memo)
 	picker = preload("res://scripts/lockpick.gd").new()
 	ui.add_child(picker)
 	picker.slipped.connect(func(): noise_at(player.cell, 6.0))
@@ -158,6 +159,15 @@ func open_pocket() -> void:
 			await content.use_item(r["item"], r["action"])
 		else:
 			content.pocket_closed())
+
+
+## 주운 메모장을 펼친다 (적는 동안 시간이 멈춘다)
+func open_memo() -> void:
+	if _running or not Game.has("notepad"):
+		return
+	run(func():
+		Sfx.play("page")
+		await memo.open())
 
 
 func fade(a: float, secs := 0.4) -> void:
